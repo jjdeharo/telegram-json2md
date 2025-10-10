@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de JSON de Telegram a Markdown</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        .upload-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        
+        .upload-section:hover {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+        
+        .file-input {
+            margin: 15px 0;
+        }
+        
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .output-section {
+            margin-top: 30px;
+        }
+        
+        .preview-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .markdown-preview {
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .markdown-preview h1, .markdown-preview h2, .markdown-preview h3 {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .markdown-preview blockquote {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-left: 3px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        
+        .markdown-preview p {
+            margin: 10px 0;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.processing {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .download-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .month-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .month-btn {
+            padding: 5px 10px;
+            min-width: 120px;
+        }
+        
+        .current-month {
+            background-color: #28a745 !important;
+        }
+        
+        .current-month:hover {
+            background-color: #218838 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Conversor de JSON de Telegram a Markdown</h1>
+        
+        <div class="upload-section">
+            <h2>Subir Archivos JSON</h2>
+            <input type="file" id="jsonFiles" class="file-input" accept=".json" multiple>
+            <p>Selecciona uno o más archivos JSON exportados de Telegram</p>
+            <button id="convertBtn" class="btn" disabled>Convertir a Markdown</button>
+        </div>
+        
+        <div id="status" class="status hidden"></div>
+        
+        <div class="output-section">
+            <h2>Previsualización de Conversaciones</h2>
+            <div id="monthNav" class="month-nav hidden"></div>
+            <div id="previewContainer" class="preview-container hidden">
+                <div class="preview-header">
+                    <h3 id="currentMonthTitle">Conversación</h3>
+                    <div>
+                        <button id="downloadBtn" class="btn">Descargar Archivo</button>
+                        <button id="downloadAllBtn" class="btn">Descargar Todos</button>
+                    </div>
+                </div>
+                <div id="markdownPreview" class="markdown-preview"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const jsonFilesInput = document.getElementById('jsonFiles');
+            const convertBtn = document.getElementById('convertBtn');
+            const previewContainer = document.getElementById('previewContainer');
+            const markdownPreview = document.getElementById('markdownPreview');
+            const statusDiv = document.getElementById('status');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const monthNav = document.getElementById('monthNav');
+            const currentMonthTitle = document.getElementById('currentMonthTitle');
+            
+            let markdownFiles = {};
+            let currentMonthKey = '';
+            
+            // Activar botón de conversión cuando se seleccionen archivos
+            jsonFilesInput.addEventListener('change', () => {
+                convertBtn.disabled = jsonFilesInput.files.length === 0;
+            });
+            
+            // Función para mostrar estado
+            function showStatus(message, type) {
+                statusDiv.textContent = message;
+                statusDiv.className = `status ${type}`;
+                statusDiv.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    statusDiv.classList.add('hidden');
+                }, 5000);
+            }
+            
+            // Función para procesar archivos JSON
+            async function processFiles() {
+                if (jsonFilesInput.files.length === 0) {
+                    showStatus('Por favor selecciona al menos un archivo JSON', 'error');
+                    return;
+                }
+                
+                showStatus('Procesando archivos JSON...', 'processing');
+                
+                try {
+                    const allMessages = [];
+                    
+                    // Procesar cada archivo JSON
+                    for (const file of jsonFilesInput.files) {
+                        const text = await file.text();
+                        const jsonData = JSON.parse(text);
+                        
+                        // Verificar que sea un archivo exportado de Telegram
+                        if (!jsonData.messages || !Array.isArray(jsonData.messages)) {
+                            throw new Error(`El archivo ${file.name} no parece ser un archivo exportado de Telegram válido.`);
+                        }
+                        
+                        allMessages.push(...jsonData.messages);
+                    }
+                    
+                    // Procesar los mensajes y generar archivos Markdown
+                    markdownFiles = convertToMarkdown(allMessages);
+                    
+                    // Mostrar primera previsualización
+                    const monthKeys = Object.keys(markdownFiles);
+                    if (monthKeys.length > 0) {
+                        currentMonthKey = monthKeys[0];
+                        showPreview(currentMonthKey);
+                        createMonthNavigation(monthKeys);
+                        showStatus('Conversión completada', 'success');
+                    } else {
+                        showStatus('No se encontraron mensajes para convertir', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showStatus(`Error: ${error.message}`, 'error');
+                }
+            }
+            
+            // Función para convertir mensajes JSON a Markdown
+            function convertToMarkdown(messages) {
+                // Filtrar mensajes válidos (solo tipo "message" con texto útil)
+                const validMessages = messages.filter(msg => 
+                    msg.type === "message" && 
+                    (msg.text || (Array.isArray(msg.text) && msg.text.some(item => 
+                        typeof item === 'string' || (item && typeof item.text === 'string')
+                    )))
+                );
+                
+                // Organizar mensajes por fecha (día)
+                const messagesByDate = {};
+                validMessages.forEach(msg => {
+                    const date = new Date(msg.date);
+                    const dateKey = formatDateKey(date); // formato YYYY-MM-DD
+                    
+                    if (!messagesByDate[dateKey]) {
+                        messagesByDate[dateKey] = [];
+                    }
+                    
+                    messagesByDate[dateKey].push(msg);
+                });
+                
+                // Obtener el nombre del canal o grupo si está disponible
+                const chatName = (validMessages[0] && validMessages[0].chat && validMessages[0].chat.title) || "Conversación";
+                
+                // Organizar mensajes por mes
+                const messagesByMonth = {};
+                Object.entries(messagesByDate).sort().forEach(([dateKey, dayMessages]) => {
+                    const date = new Date(dateKey);
+                    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    
+                    if (!messagesByMonth[monthKey]) {
+                        messagesByMonth[monthKey] = [];
+                    }
+                    
+                    messagesByMonth[monthKey].push(...dayMessages);
+                });
+                
+                // Convertir cada mes a contenido Markdown
+                const markdownFiles = {};
+                
+                Object.entries(messagesByMonth).forEach(([monthKey, monthMessages]) => {
+                    // Agrupar mensajes por día dentro del mes
+                    const days = {};
+                    monthMessages.forEach(msg => {
+                        const date = new Date(msg.date);
+                        const dateKey = formatDateKey(date);
+                        
+                        if (!days[dateKey]) {
+                            days[dateKey] = [];
+                        }
+                        
+                        days[dateKey].push(msg);
+                    });
+                    
+                    // Construir contenido Markdown
+                    let markdownContent = `# ${chatName}\n\n`;
+                    
+                    // Procesar cada día en orden cronológico
+                    Object.keys(days)
+                        .sort() // Ordenar cronológicamente
+                        .forEach(dateKey => {
+                            const date = new Date(dateKey);
+                            const dayMessages = days[dateKey].sort((a, b) => new Date(a.date) - new Date(b.date));
+                            
+                            // Agregar encabezado de día en español
+                            markdownContent += `## ${formatDateToSpanish(date)}\n\n`;
+                            
+                            // Procesar cada mensaje del día en orden cronológico
+                            dayMessages.forEach(msg => {
+                                // Formatear el autor
+                                const author = msg.from || "Desconocido";
+                                const authorId = msg.from_id || "ID no disponible";
+                                const time = formatTime(new Date(msg.date));
+                                
+                                // Formatear el texto del mensaje
+                                let messageText = formatMessageText(msg.text);
+                                
+                                // Si es una respuesta, formatear como cita
+                                if (msg.reply_to_message_id) {
+                                    // Buscar el mensaje original al que responde
+                                    const originalMsg = validMessages.find(m => m.id === msg.reply_to_message_id);
+                                    const originalAuthor = originalMsg ? (originalMsg.from || "Desconocido") : "Desconocido";
+                                    const originalAuthorId = originalMsg ? (originalMsg.from_id || "ID no disponible") : "ID no disponible";
+                                    const originalTime = originalMsg ? formatTime(new Date(originalMsg.date)) : "HH:MM";
+                                    
+                                    markdownContent += `> ↩︎ **${author} (ID: ${authorId}) (${time})** en respuesta a ${originalAuthor} (ID: ${originalAuthorId}) (${originalTime})  \n`;
+                                    markdownContent += `> ${messageText}\n\n`;
+                                } else {
+                                    // Mensaje normal
+                                    markdownContent += `**${author} (ID: ${authorId}) (${time})**  \n${messageText}\n\n`;
+                                }
+                            });
+                        });
+                    
+                    markdownFiles[monthKey] = markdownContent;
+                });
+                
+                return markdownFiles;
+            }
+            
+            // Función para formatear el texto de un mensaje
+            function formatMessageText(text) {
+                if (typeof text === 'string') {
+                    return text;
+                } else if (Array.isArray(text)) {
+                    // Si es una lista de segmentos, combinarlos
+                    return text.map(segment => {
+                        if (typeof segment === 'string') {
+                            return segment;
+                        } else if (segment.type && segment.text) {
+                            // Formatear según tipo de segmento (negrita, enlace, etc.)
+                            switch (segment.type) {
+                                case 'bold':
+                                    return `**${segment.text}**`;
+                                case 'italic':
+                                    return `*${segment.text}*`;
+                                case 'code':
+                                    return `\`${segment.text}\``;
+                                case 'pre':
+                                    return `\`\`\`\n${segment.text}\n\`\`\``;
+                                case 'text_link':
+                                    return `[${segment.text}](${segment.href})`;
+                                default:
+                                    return segment.text;
+                            }
+                        }
+                        return '';
+                    }).join('');
+                } else {
+                    return '';
+                }
+            }
+            
+            // Función para formatear la fecha como YYYY-MM-DD
+            function formatDateKey(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                
+                return `${year}-${month}-${day}`;
+            }
+            
+            // Función para formatear la fecha en español
+            function formatDateToSpanish(date) {
+                const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+                const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                
+                const dayName = days[date.getDay()];
+                const day = date.getDate();
+                const month = months[date.getMonth()];
+                const year = date.getFullYear();
+                
+                return `${day} ${month} ${year}`;
+            }
+            
+            // Función para formatear la hora como HH:MM
+            function formatTime(date) {
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                
+                return `${hours}:${minutes}`;
+            }
+            
+            // Función simple para convertir Markdown a HTML
+            function markdownToHtml(markdown) {
+                let html = markdown;
+                
+                // Convertir encabezados
+                html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+                html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+                html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+                
+                // Convertir negritas
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                
+                // Convertir cursivas
+                html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                
+                // Convertir citas (bloquequotes)
+                html = html.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
+                html = html.replace(/<blockquote>([^]*?)\n<\/blockquote>/g, function(match, content) {
+                    return '<blockquote>' + content.replace(/\n> /g, '<br>') + '</blockquote>';
+                });
+                
+                // Convertir enlaces
+                html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+                
+                // Convertir código en línea
+                html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+                
+                // Convertir bloques de código
+                html = html.replace(/```([\s\S]*?)```/g, '<pre>$1</pre>');
+                
+                // Convertir saltos de línea
+                html = html.replace(/\n\n/g, '</p><p>');
+                html = html.replace(/\n/g, '<br>');
+                
+                // Asegurar párrafos
+                html = '<p>' + html + '</p>';
+                html = html.replace(/<p><\/p>/g, ''); // Eliminar párrafos vacíos
+                
+                return html;
+            }
+
+            // Función para mostrar la previsualización de un archivo
+            function showPreview(monthKey) {
+                if (markdownFiles[monthKey]) {
+                    // Convertir Markdown a HTML para la previsualización
+                    const htmlContent = markdownToHtml(markdownFiles[monthKey]);
+                    markdownPreview.innerHTML = htmlContent;
+                    currentMonthKey = monthKey;
+                    
+                    // Actualizar título del mes
+                    const [year, month] = monthKey.split('-');
+                    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                    currentMonthTitle.textContent = `Conversación - ${monthNames[parseInt(month) - 1]} ${year}`;
+                    
+                    // Actualizar botones de navegación de mes
+                    document.querySelectorAll('.month-btn').forEach(btn => {
+                        btn.classList.remove('current-month');
+                        if (btn.dataset.month === monthKey) {
+                            btn.classList.add('current-month');
+                        }
+                    });
+                    
+                    previewContainer.classList.remove('hidden');
+                }
+            }
+            
+            // Función para crear la navegación por meses
+            function createMonthNavigation(monthKeys) {
+                monthNav.innerHTML = '';
+                
+                monthKeys.forEach(monthKey => {
+                    const [year, month] = monthKey.split('-');
+                    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                    
+                    const monthBtn = document.createElement('button');
+                    monthBtn.className = 'btn month-btn';
+                    monthBtn.textContent = `${monthNames[parseInt(month) - 1]} ${year}`;
+                    monthBtn.dataset.month = monthKey;
+                    
+                    monthBtn.addEventListener('click', () => showPreview(monthKey));
+                    
+                    monthNav.appendChild(monthBtn);
+                });
+                
+                monthNav.classList.remove('hidden');
+            }
+            
+            // Función para descargar un archivo
+            function downloadFile(content, filename) {
+                const blob = new Blob([content], { type: 'text/markdown' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Limpiar
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            }
+            
+            // Función para descargar todos los archivos en un archivo ZIP
+            async function downloadAllFiles() {
+                if (Object.keys(markdownFiles).length === 0) {
+                    showStatus('No hay archivos para descargar. Primero debes convertir los archivos JSON.', 'error');
+                    return;
+                }
+                
+                const zip = new JSZip();
+                
+                // Agregar cada archivo Markdown al ZIP
+                for (const [monthKey, content] of Object.entries(markdownFiles)) {
+                    const [year, month] = monthKey.split('-');
+                    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                    const filename = `conversacion-${year}-${month}.md`;
+                    zip.file(filename, content);
+                }
+                
+                // Generar el archivo ZIP
+                const zipBlob = await zip.generateAsync({type: 'blob'});
+                
+                // Crear y descargar el archivo ZIP
+                const url = URL.createObjectURL(zipBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'conversaciones-telegram.zip';
+                document.body.appendChild(a);
+                a.click();
+                
+                // Limpiar
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            }
+            
+            // Event listeners
+            convertBtn.addEventListener('click', processFiles);
+            
+            downloadBtn.addEventListener('click', () => {
+                if (currentMonthKey && markdownFiles[currentMonthKey]) {
+                    const [year, month] = currentMonthKey.split('-');
+                    const filename = `conversacion-${year}-${month}.md`;
+                    downloadFile(markdownFiles[currentMonthKey], filename);
+                }
+            });
+            
+            // Event listener para descargar todos los archivos
+            document.getElementById('downloadAllBtn').addEventListener('click', downloadAllFiles);
+        });
+    </script>
+</body>
+</html>
