@@ -196,13 +196,29 @@ dice que lo ha resuelto y las comprobaciones fallan, el aviso que sale es el de
 Cada reparación queda en [`docs/reparaciones.md`](reparaciones.md), versionado, y
 se cuenta por Telegram. Si ese archivo está vacío, es que nunca se ha roto nada.
 
+## El parte de cada día
+
+Al final de cada pasada se manda por Telegram un resumen de tres o cuatro líneas
+con lo hecho: cuántas conversaciones se actualizaron, si la documentación de
+eXeLearning cambió, si hubo que clasificar algo nuevo y en qué versión va el CLI.
+
+Se arma leyendo el registro del día, quedándose solo con la última pasada —el
+archivo acumula los reintentos del cuarto de hora—. Y se manda **todos los
+días**, también cuando no hay nada que contar: sin él, un día tranquilo sería
+indistinguible de un día en que cron no llegó a dispararse.
+
+```bash
+python3 scripts/resumen-diario.py                       # el de hoy
+python3 scripts/resumen-diario.py registro/diario-….log # el de otro día
+```
+
 ## Cómo te enteras de lo que pasa
 
 | Canal | Para qué |
 |---|---|
 | Notificación en pantalla | El progreso de la pasada, si estás delante |
 | Cartel fijo con sonido | Un fallo que nadie ha podido arreglar |
-| **Telegram, desde el bot «Agentes IA»** | Lo que hay que contar aunque no estés: actualizaciones, reparaciones, documentación clasificada sola |
+| **Telegram, desde el bot «Agentes IA»** | El parte de cada pasada, y lo que hay que contar aunque no estés: actualizaciones, reparaciones, documentación clasificada sola |
 | `registro/avisos.log` | Todo lo enviado, por si Telegram falla |
 | `docs/reparaciones.md` y `docs/decisiones-automaticas.md` | El detalle, versionado |
 

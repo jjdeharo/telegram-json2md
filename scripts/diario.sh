@@ -114,6 +114,12 @@ if python3 "$BASE/scripts/actualizar.py" || { reparar "el archivado de las conve
   # comprueba que todo sigue en pie y, si la nueva rompe algo, se vuelve sola a la
   # anterior. Va al final y sin condicionar nada, con el día ya archivado.
   python3 "$BASE/scripts/actualizar-cli.py" || true
+
+  # Y el parte del día por Telegram. Va al final, cuando ya se sabe todo lo que
+  # ha pasado, y es lo único que se manda los días en que no ocurre nada: sin
+  # esto, un día normal sería indistinguible de un día en que cron no llegó a
+  # dispararse.
+  python3 "$BASE/scripts/resumen-diario.py" >/dev/null 2>&1 || true
   touch "$MARCA"
   find "$REGISTRO" -maxdepth 1 -name '.hecho-*' -mtime +7 -delete
   find "$REGISTRO" -maxdepth 1 -name 'diario-*.log' -mtime +60 -delete
