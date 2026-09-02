@@ -1,6 +1,6 @@
 ---
 name: cuaderno-exelearning
-description: Mantiene la documentación técnica y el manual del cuaderno de NotebookLM de eXeLearning (Karla). Usar para la revisión mensual, cuando aparezca documentación nueva en el repositorio de eXeLearning, cuando salga un manual de usuario nuevo, o cuando se pida revisar, actualizar o decidir qué fuentes lleva ese cuaderno.
+description: Mantiene la documentación técnica y el manual del cuaderno de NotebookLM de eXeLearning (Karla). Usar para comprobar lo que el automatismo decidió solo, cuando aparezca documentación nueva en el repositorio de eXeLearning, cuando salga un manual de usuario nuevo, o cuando se pida revisar, actualizar o decidir qué fuentes lleva ese cuaderno.
 ---
 
 # El cuaderno de eXeLearning
