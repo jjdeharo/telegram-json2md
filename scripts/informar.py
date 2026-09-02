@@ -38,7 +38,8 @@ BASE = Path(__file__).resolve().parent.parent
 CONFIG = BASE / "config.json"
 SESION = BASE / "sesion" / "telegram"
 BITACORA = BASE / "registro" / "avisos.log"
-BOT_GLOBAL = Path.home() / ".claude" / "telegram-claude-ia.json"
+BOT_GLOBAL = Path.home() / ".config" / "avisar-juanjo" / "config.json"
+BOT_ANTIGUO = Path.home() / ".claude" / "telegram-claude-ia.json"
 
 
 def _bot() -> dict:
@@ -49,7 +50,7 @@ def _bot() -> dict:
     no estuviera, se mira aquí por compatibilidad y, en último extremo, el aviso
     se manda a «Mensajes guardados», que llega aunque no notifique.
     """
-    for ruta, clave in ((BOT_GLOBAL, None), (CONFIG, "bot_avisos")):
+    for ruta, clave in ((BOT_GLOBAL, None), (BOT_ANTIGUO, None), (CONFIG, "bot_avisos")):
         if not ruta.exists():
             continue
         with open(ruta, encoding="utf-8") as f:
