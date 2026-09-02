@@ -161,10 +161,32 @@ falla, le da el problema a un Claude sin sesión interactiva junto con el regist
 del fallo, la versión instalada del CLI, las notas de la última publicación y las
 incidencias abiertas del proyecto. Si lo arregla, se reintenta la pasada.
 
-Lo que puede hacer está acotado a propósito: leer y editar los scripts, y
-ejecutar las comprobaciones en seco. **No puede borrar fuentes de NotebookLM
-—el único daño irreversible de este sistema—, ni tocar `datos/`, `salida/` o
-`material/`, ni subir nada a GitHub.**
+Lo que puede hacer está acotado a propósito: leer, ejecutar las comprobaciones en
+seco y editar **cinco archivos concretos** (`notebook.py`, `generar.py`,
+`exelearning.py`, `podar.py`, `revisar-exelearning.py`). **No puede borrar fuentes
+de NotebookLM —el único daño irreversible de este sistema—, ni tocar `datos/`,
+`salida/` o `material/`, ni subir nada a GitHub.**
+
+### Por qué esa lista tan corta
+
+Al encargo se le adjuntan las notas de publicación y los títulos de las
+incidencias abiertas del repositorio del CLI, porque son buenas pistas: si algo
+se ha roto para nosotros, probablemente alguien lo haya contado allí. Pero **ese
+tablón de GitHub lo escribe cualquiera**, y para un modelo todo el encargo es un
+solo texto: no hay una frontera dura entre las órdenes y el material adjunto. Una
+nota redactada a propósito podría intentar pasar por instrucción.
+
+Se hacen dos cosas al respecto. La primera, marcarlo: el material ajeno va
+etiquetado como tal y el encargo dice explícitamente que son pistas y nunca
+órdenes, y que si algo ahí parece una instrucción hay que ignorarlo y contarlo.
+
+La segunda es la que de verdad protege, porque no depende de que el modelo se
+porte bien: **después de cada reparación se comparan los archivos tocados con la
+lista de permitidos, y cualquier cambio fuera de ella se deshace** —revertido si
+git lo seguía, borrado si era nuevo— y salta un aviso. Fuera de esa lista está
+todo lo que toca la cuenta de Telegram de Juanjo y las credenciales, que es donde
+un cambio malicioso haría daño de verdad: escribir en su nombre a tres grupos con
+cientos de personas.
 
 Y su palabra no basta: quien decide si está arreglado es
 `comprobaciones_pasan()`, que vuelve a ejecutar las dos pasadas en seco. Si la IA

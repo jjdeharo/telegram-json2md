@@ -67,8 +67,16 @@ toca ese código y se filtran en las respuestas al usuario.
 
 Si una pasada falla, `scripts/reparar.py` le da el problema a un Claude sin
 sesión interactiva —con el registro, la versión del CLI, las notas de la última
-publicación y las incidencias del proyecto—, que puede leer y editar los scripts
-y ejecutar las comprobaciones en seco, y nada más. Después se comprueba de verdad
+publicación y las incidencias del proyecto—, que puede leer, ejecutar las
+comprobaciones en seco y editar cinco archivos concretos, y nada más. Después,
+un cerrojo compara qué archivos se tocaron y deshace lo que esté fuera de esa
+lista: el encargo incluye texto escrito por desconocidos en GitHub, y ahí es
+donde muere cualquier instrucción que alguien intentara colar.
+
+**Si amplías `EDITABLES` en `scripts/reparar.py`, piensa antes qué toca ese
+archivo.** Todo lo que use la sesión de Telegram o las credenciales se queda
+fuera: el peor caso no es que se rompa el archivo, es que algo escriba en nombre
+de Juanjo a tres grupos con cientos de personas. Después se comprueba de verdad
 si quedó arreglado, y se cuenta por Telegram.
 
 Antes de ponerte a diagnosticar tú un fallo, mira si ya se intentó:
