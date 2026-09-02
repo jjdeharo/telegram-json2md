@@ -137,24 +137,52 @@ una herramienta **no oficial**: automatiza NotebookLM reutilizando las cookies d
 la sesión de Google, así que un cambio en NotebookLM puede romperla cualquier
 día. Si eso pasa, saldrá como cartel en pantalla y quedará en `registro/`.
 
-Publica una versión estable cada pocas semanas. La pasada diaria comprueba si ha
-salido una y **avisa una sola vez por versión**, pero no actualiza sola: la
-actualización es la parte arriesgada y hay que comprobarla después. Lo que
-interesa de ese aviso no son las novedades, sino que cuando esto se rompa el
-arreglo llegará precisamente así.
+Publica una versión estable cada pocas semanas. **La pasada diaria la instala
+sola**, pero nunca a ciegas: después comprueba que el CLI sigue hablando con
+NotebookLM y que las dos pasadas en seco terminan bien. Si la versión nueva rompe
+algo, vuelve sola a la anterior —perder una versión no cuesta nada; perder días
+de archivo, sí— y lo cuenta por Telegram. Si ni volviendo atrás se arregla, ya no
+es cosa de versiones y llama a la reparación automática.
 
-Después de actualizar, comprobar que el automatismo sigue en pie, sin darlo por
-hecho:
+Para hacerlo a mano, o solo mirar:
 
 ```bash
-uv tool upgrade notebooklm-py
-notebooklm skill install          # el skill viene dentro del propio paquete
-notebooklm auth check --test --json
-python3 scripts/actualizar.py --sin-subir
-python3 scripts/exelearning.py --sin-subir
+python3 scripts/actualizar-cli.py             # actualizar y comprobar
+python3 scripts/actualizar-cli.py --solo-ver  # solo decir si hay novedad
 ```
 
 Si algo falla, se vuelve atrás con `uv tool install notebooklm-py==<versión>`.
+
+## Cuando algo se rompe, se busca la solución
+
+Un fallo a las siete de la mañana no tiene a nadie delante, y dejarlo esperando a
+que alguien lea un cartel cuesta días de archivo. Así que la pasada diaria, si
+falla, le da el problema a un Claude sin sesión interactiva junto con el registro
+del fallo, la versión instalada del CLI, las notas de la última publicación y las
+incidencias abiertas del proyecto. Si lo arregla, se reintenta la pasada.
+
+Lo que puede hacer está acotado a propósito: leer y editar los scripts, y
+ejecutar las comprobaciones en seco. **No puede borrar fuentes de NotebookLM
+—el único daño irreversible de este sistema—, ni tocar `datos/`, `salida/` o
+`material/`, ni subir nada a GitHub.**
+
+Y su palabra no basta: quien decide si está arreglado es
+`comprobaciones_pasan()`, que vuelve a ejecutar las dos pasadas en seco. Si la IA
+dice que lo ha resuelto y las comprobaciones fallan, el aviso que sale es el de
+«no he podido arreglarlo».
+
+Cada reparación queda en [`docs/reparaciones.md`](reparaciones.md), versionado, y
+se cuenta por Telegram. Si ese archivo está vacío, es que nunca se ha roto nada.
+
+## Cómo te enteras de lo que pasa
+
+| Canal | Para qué |
+|---|---|
+| Notificación en pantalla | El progreso de la pasada, si estás delante |
+| Cartel fijo con sonido | Un fallo que nadie ha podido arreglar |
+| **Telegram (Mensajes guardados)** | Lo que hay que contar aunque no estés: actualizaciones, reparaciones, documentación clasificada sola |
+| `registro/avisos.log` | Todo lo enviado, por si Telegram falla |
+| `docs/reparaciones.md` y `docs/decisiones-automaticas.md` | El detalle, versionado |
 
 ## Cuando algo va mal
 

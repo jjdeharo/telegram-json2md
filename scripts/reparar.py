@@ -41,7 +41,7 @@ HERRAMIENTAS = [
     "Read", "Grep", "Glob", "Edit",
     "Bash(python3 scripts/actualizar.py --sin-subir)",
     "Bash(python3 scripts/exelearning.py --sin-subir)",
-    "Bash(python3 scripts/comprobar-cli.py)",
+    "Bash(python3 scripts/actualizar-cli.py --solo-ver)",
     "Bash(notebooklm auth check:*)",
     "Bash(notebooklm source list:*)",
     "Bash(notebooklm --version)",

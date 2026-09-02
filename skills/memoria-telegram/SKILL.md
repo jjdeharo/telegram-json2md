@@ -63,6 +63,21 @@ la lista concreta, en `INCLUIR` dentro del script. **No metas `AGENTS.md` ni
 `CLAUDE.md` del repositorio de eXeLearning**: son instrucciones para una IA que
 toca ese código y se filtran en las respuestas al usuario.
 
+## Esto se repara solo, y avisa por Telegram
+
+Si una pasada falla, `scripts/reparar.py` le da el problema a un Claude sin
+sesión interactiva —con el registro, la versión del CLI, las notas de la última
+publicación y las incidencias del proyecto—, que puede leer y editar los scripts
+y ejecutar las comprobaciones en seco, y nada más. Después se comprueba de verdad
+si quedó arreglado, y se cuenta por Telegram.
+
+Antes de ponerte a diagnosticar tú un fallo, mira si ya se intentó:
+
+```bash
+cat docs/reparaciones.md          # qué se rompió y qué se hizo
+tail -20 registro/avisos.log      # qué se le ha contado a Juanjo
+```
+
 ## Reglas que no debes romper
 
 1. **Nunca versiones datos.** El repositorio es **público** y las conversaciones
@@ -87,7 +102,7 @@ Mira siempre primero `registro/diario-<fecha>.log`.
 | Síntoma | Solución |
 |---|---|
 | `la sesión de NotebookLM ha caducado` | `notebooklm login` (necesita navegador: pídeselo a Juanjo con `!` si no puedes) |
-| Nada funciona con NotebookLM y la sesión es válida | El CLI es una herramienta no oficial y puede romperse cuando Google cambia algo. Mira si hay versión nueva (`python3 scripts/comprobar-cli.py`) y actualiza siguiendo `docs/automatizacion.md` |
+| Nada funciona con NotebookLM y la sesión es válida | El CLI es una herramienta no oficial y se rompe cuando Google cambia algo. `python3 scripts/actualizar-cli.py` instala la versión nueva y comprueba; si rompe, vuelve sola atrás |
 | `La sesión de Telegram no está autorizada` | Borrar `sesion/telegram.session` y ejecutar `actualizar.py` a mano: pedirá el código por Telegram |
 | Un mes duplicado en el notebook | Se arregla solo en la siguiente pasada; si urge, borra la fuente más antigua de ese título |
 | Un grupo falla y los otros no | Es lo previsto. Reintenta ese grupo con `--solo <prefijo>` |

@@ -31,6 +31,7 @@ BASE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE / "scripts"))
 
 import exelearning  # noqa: E402
+from informar import informar  # noqa: E402
 
 SCRIPT_SINCRONIZADOR = BASE / "scripts" / "exelearning.py"
 AVISAR = BASE / "scripts" / "avisar.sh"
@@ -287,6 +288,15 @@ def main() -> int:
     resumen = (f"Documentación nueva de eXeLearning: {nuevas} al cuaderno, "
                f"{len(hechas['excluir'])} descartada(s).")
     subprocess.run([str(AVISAR), "fin", resumen], capture_output=True, check=False)
+
+    # Y por Telegram, con el detalle: son decisiones tomadas sin preguntar a
+    # nadie, así que lo menos que puede hacerse es contarlas.
+    detalle = "\n".join(f"• {d['ruta'].split('/')[-1]} → {d['decision']}" for d in validas[:12])
+    if len(validas) > 12:
+        detalle += f"\n• …y {len(validas) - 12} más"
+    informar(f"📄 Ha aparecido documentación nueva en el repositorio de eXeLearning "
+             f"y la he clasificado sola:\n\n{detalle}\n\n"
+             f"{nuevas} al cuaderno. El porqué de cada una, en docs/decisiones-automaticas.md")
     return 0
 
 

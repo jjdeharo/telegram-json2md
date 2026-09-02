@@ -68,9 +68,10 @@ esperar "sesión gráfica" 120 xset q || true
 # propio ritmo, así que se sincroniza siempre, pero un fallo suyo no invalida el
 # archivado del día: se anota y se reintenta mañana.
 sincronizar_exelearning() {
-  if ! python3 "$BASE/scripts/exelearning.py"; then
-    printf '%s  la sincronización de eXeLearning falló; se reintentará mañana\n' "$(date '+%F %T')"
-  fi
+  python3 "$BASE/scripts/exelearning.py" && return 0
+  reparar "la sincronización de la documentación de eXeLearning falló" &&
+    python3 "$BASE/scripts/exelearning.py" && return 0
+  printf '%s  eXeLearning sigue fallando; se reintentará mañana\n' "$(date '+%F %T')"
 }
 
 # Mirar si ha aparecido documentación nueva es distinto de sincronizar la que ya
@@ -92,20 +93,34 @@ revisar_exelearning() {
     printf '%s  la decisión automática falló; se reintenta mañana\n' "$(date '+%F %T')"
 }
 
-if python3 "$BASE/scripts/actualizar.py"; then
+# Cuando algo falla no hay nadie delante, así que en vez de dejar un cartel
+# esperando se le da el problema a una IA con el registro, la versión del CLI, las
+# notas de la última publicación y las incidencias abiertas del proyecto. Puede
+# leer y editar los scripts y ejecutar las comprobaciones en seco, nada más: no
+# puede borrar fuentes ni tocar los datos. Si lo arregla, se reintenta la pasada.
+reparar() {   # reparar <motivo>
+  printf '%s  fallo: %s. Buscando solución…\n' "$(date '+%F %T')" "$1"
+  python3 "$BASE/scripts/reparar.py" --motivo "$1" --registro "$LOG"
+}
+
+if python3 "$BASE/scripts/actualizar.py" || { reparar "el archivado de las conversaciones falló" &&
+     python3 "$BASE/scripts/actualizar.py"; }; then
   sincronizar_exelearning
   revisar_exelearning
   # La marca se pone solo si la pasada terminó bien. Si falló, los disparos del
   # cuarto de hora seguirán reintentando: un corte de red pasajero se arregla
   # solo sin que nadie tenga que enterarse.
-  # Y por último, si ha salido versión nueva del CLI de NotebookLM. Va al final y
-  # sin condicionar nada: es un aviso, no una tarea.
-  python3 "$BASE/scripts/comprobar-cli.py" || true
+  # Y por último, si ha salido versión nueva del CLI de NotebookLM: se instala, se
+  # comprueba que todo sigue en pie y, si la nueva rompe algo, se vuelve sola a la
+  # anterior. Va al final y sin condicionar nada, con el día ya archivado.
+  python3 "$BASE/scripts/actualizar-cli.py" || true
   touch "$MARCA"
   find "$REGISTRO" -maxdepth 1 -name '.hecho-*' -mtime +7 -delete
   find "$REGISTRO" -maxdepth 1 -name 'diario-*.log' -mtime +60 -delete
   exit 0
 fi
 
-printf '%s  la pasada falló; se reintentará en el siguiente disparo\n' "$(date '+%F %T')"
+# Si se llega aquí, ni la pasada ni la reparación salieron bien. El aviso ya lo
+# ha mandado reparar.py por Telegram; aquí solo queda el rastro y el reintento.
+printf '%s  la pasada falló y no se pudo reparar; se reintentará en el siguiente disparo\n' "$(date '+%F %T')"
 exit 1
