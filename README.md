@@ -58,6 +58,7 @@ scripts/
   generar.py            JSON → salida/<grupo>/conversacion-YYYY-MM.md + índice
   procesar_telegram.py  la conversión en sí: hilos, días, formato
   notebook.py           alta y baja de fuentes en NotebookLM
+  podar.py              comprime exportaciones viejas y acota el estado
   avisar.sh             avisos en pantalla
   diario.sh             la pasada diaria, tal como la lanza cron
   instalar.sh           instala o retira el disparo en el crontab

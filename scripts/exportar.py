@@ -99,5 +99,10 @@ async def exportar_mes(cliente, grupo: dict, mes: str, hasta: datetime | None = 
     with open(destino, "w", encoding="utf-8") as f:
         json.dump(exportacion, f, ensure_ascii=False, indent=1)
 
+    # Si el mes venía comprimido por la poda, la versión recién exportada lo
+    # sustituye: dejar las dos haría ambiguo cuál manda.
+    comprimida = destino.with_suffix(".json.gz")
+    comprimida.unlink(missing_ok=True)
+
     utiles = sum(1 for m in mensajes if m["type"] == "message" and m["text"])
     return {"mes": mes, "total": len(mensajes), "utiles": utiles, "ruta": destino}

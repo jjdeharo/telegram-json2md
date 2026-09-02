@@ -9,6 +9,7 @@ los que ya están en los notebooks.
 
 from __future__ import annotations
 
+import gzip
 import hashlib
 import json
 from pathlib import Path
@@ -32,14 +33,21 @@ def huella(contenido: str) -> str:
     return hashlib.sha256(contenido.encode("utf-8")).hexdigest()
 
 
+def leer_exportacion(prefijo: str, mes: str) -> dict:
+    """Lee la exportación de un mes, esté en claro o comprimida por la poda."""
+    plano = DATOS / f"{prefijo}-{mes}.json"
+    if plano.exists():
+        with open(plano, encoding="utf-8") as f:
+            return json.load(f)
+    with gzip.open(plano.with_suffix(".json.gz"), "rt", encoding="utf-8") as f:
+        return json.load(f)
+
+
 def generar_mes(grupo: dict, mes: str) -> dict:
     """Regenera el Markdown de un mes. Devuelve su ruta y su huella."""
-    origen = DATOS / f"{grupo['prefijo']}-{mes}.json"
     destino = SALIDA / grupo["carpeta"] / f"conversacion-{mes}.md"
     destino.parent.mkdir(parents=True, exist_ok=True)
-
-    with open(origen, encoding="utf-8") as f:
-        datos = json.load(f)
+    datos = leer_exportacion(grupo["prefijo"], mes)
 
     info = {k: datos[k] for k in ("name", "type", "id") if k in datos}
     contenido = generar_markdown(datos.get("messages", []), info)
@@ -56,10 +64,11 @@ def generar_mes(grupo: dict, mes: str) -> dict:
 
 def titulo_grupo(grupo: dict) -> str:
     """Nombre y tipo del grupo, leídos de la última exportación disponible."""
-    jsons = sorted(DATOS.glob(f"{grupo['prefijo']}-*.json"))
+    jsons = sorted(DATOS.glob(f"{grupo['prefijo']}-*.json*"))
     if jsons:
         try:
-            with open(jsons[-1], encoding="utf-8") as f:
+            abrir = gzip.open if jsons[-1].suffix == ".gz" else open
+            with abrir(jsons[-1], "rt", encoding="utf-8") as f:
                 datos = json.load(f)
             nombre = datos.get("name", grupo["carpeta"])
             tipo = obtener_tipo_chat_legible(datos.get("type", ""))

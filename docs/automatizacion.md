@@ -98,6 +98,36 @@ hay que subirlo igualmente.
 Borrar `estado.json` no rompe nada: la siguiente pasada rehace el último mes
 completo y lo vuelve a subir.
 
+## Qué crece y qué se poda
+
+El archivo de conversaciones crece por definición: es la memoria de los grupos.
+Son unos **4 MB al año** entre los tres, y no se toca nada de eso. Lo demás está
+acotado, y de ello se encarga `scripts/podar.py` al final de cada pasada:
+
+| Qué | Cuánto se guarda |
+|---|---|
+| `salida/*.md` | **Todo, para siempre.** Es el producto |
+| `datos/*.json` | Los 3 últimos meses en claro; los anteriores, comprimidos (ocupan la décima parte) |
+| `estado.json` | Los 3 últimos meses por grupo |
+| `registro/diario-*.log` | 60 días |
+| `registro/.hecho-*` | 7 días |
+| `registro/disparos.log` | Las últimas 200 líneas |
+| El repositorio git | Solo código: no crece con los datos |
+
+Las exportaciones antiguas se comprimen en vez de borrarse porque son la única
+copia congelada de lo que Telegram tenía ese día, y se siguen leyendo sin
+descomprimir nada a mano: regenerar un mes comprimido funciona igual. Si se
+reexporta un mes que estaba comprimido, la versión nueva sustituye a la vieja.
+
+En NotebookLM se añaden 3 fuentes al mes, una por grupo. Con el plan Pro —300
+fuentes por notebook— hay margen para unos veinte años.
+
+También se puede podar suelto:
+
+```bash
+python3 scripts/podar.py
+```
+
 ## Cuando algo va mal
 
 Lo primero, el registro del día: `registro/diario-<fecha>.log`. Y `disparos.log`

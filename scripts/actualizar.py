@@ -27,6 +27,7 @@ sys.path.insert(0, str(BASE / "scripts"))
 import exportar  # noqa: E402
 import generar  # noqa: E402
 import notebook  # noqa: E402
+import podar  # noqa: E402
 
 CONFIG = BASE / "config.json"
 ESTADO = BASE / "estado.json"
@@ -214,6 +215,14 @@ async def principal(args) -> int:
 
     indice = generar.generar_indice(config["grupos"])
     registrar(f"índice regenerado: {indice.relative_to(BASE)}")
+
+    # Poda de lo redundante, para que el repositorio no engorde sin freno.
+    comprimidas = podar.comprimir_exportaciones()
+    retirados = podar.podar_estado(estado)
+    if comprimidas or retirados:
+        registrar(f"poda: {len(comprimidas)} exportación(es) comprimida(s), "
+                  f"{retirados} mes(es) fuera de estado.json")
+        guardar_estado(estado)
 
     subidas = sum(r["subidas"] for r in resumenes)
     if fallos:

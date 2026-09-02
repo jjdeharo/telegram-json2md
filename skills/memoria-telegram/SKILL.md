@@ -83,6 +83,10 @@ Mira siempre primero `registro/diario-<fecha>.log`.
 - `scripts/diario.sh` es lo que lanza cron: `@reboot` y cada 15 minutos de 7 a
   23, con marca de día hecho y cerrojo, esperando a que haya red y sesión
   gráfica. Si una pasada falla, no deja marca y el siguiente disparo reintenta.
+- `scripts/podar.py` corre al final de cada pasada: comprime las exportaciones
+  JSON de más de tres meses y recorta `estado.json`. **No es pérdida de datos**:
+  las conversaciones de `salida/` se guardan enteras y para siempre, y un mes
+  comprimido se regenera igual. Los registros se limpian solos (60 días).
 - `scripts/avisar.sh` da los avisos: el progreso reescribe una única
   notificación; solo el fallo deja cartel fijo.
 
