@@ -202,7 +202,7 @@ se cuenta por Telegram. Si ese archivo está vacío, es que nunca se ha roto nad
 |---|---|
 | Notificación en pantalla | El progreso de la pasada, si estás delante |
 | Cartel fijo con sonido | Un fallo que nadie ha podido arreglar |
-| **Telegram, desde el bot @claude_ia_jjdeharo_bot** | Lo que hay que contar aunque no estés: actualizaciones, reparaciones, documentación clasificada sola |
+| **Telegram, desde el bot «Agentes IA»** | Lo que hay que contar aunque no estés: actualizaciones, reparaciones, documentación clasificada sola |
 | `registro/avisos.log` | Todo lo enviado, por si Telegram falla |
 | `docs/reparaciones.md` y `docs/decisiones-automaticas.md` | El detalle, versionado |
 
@@ -212,10 +212,11 @@ Telegram **no notifica los mensajes que uno se escribe a sí mismo**. Los primer
 avisos iban a «Mensajes guardados» y ahí se quedaban, mudos: llegaban, pero nadie
 se enteraba. Un mensaje de un bot sí suena en el móvil.
 
-El bot **no es de este proyecto**: es «Claude IA», el canal por el que Claude le
-escribe a Juanjo desde cualquier sesión, y por eso sus credenciales viven fuera,
-en `~/.claude/telegram-claude-ia.json` (permisos 600). La skill `avisar-juanjo`
-documenta su uso general; aquí solo se usa.
+El bot **no es de este proyecto**: es «Agentes IA», el canal por el que los
+agentes de IA de Juanjo —Claude y Codex— le escriben desde cualquier sesión, y por
+eso sus credenciales viven fuera, en `~/.config/avisar-juanjo/config.json`
+(permisos 600). La skill `avisar-juanjo` y el `AGENTS.md` global de Codex
+documentan su uso general; aquí solo se usa.
 
 Si algún día hay que rehacerlo o montarlo en otro ordenador:
 

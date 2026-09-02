@@ -6,15 +6,15 @@ trabaja a las siete de la mañana. Para lo que de verdad hay que contar —que s
 actualizó una herramienta, que se clasificó documentación nueva, que algo se
 rompió— se usa Telegram, que le llega al móvil.
 
-Lo manda **el bot «Claude IA»**, y no la cuenta de Juanjo, por un motivo concreto:
+Lo manda **el bot «Agentes IA»**, y no la cuenta de Juanjo, por un motivo concreto:
 Telegram no notifica los mensajes que uno se escribe a sí mismo, así que un aviso
 en «Mensajes guardados» se queda ahí sin avisar de nada. Un mensaje de un bot sí
 suena.
 
-Ese bot no es de este proyecto: es el canal por el que Claude le escribe desde
-cualquier sesión, y sus credenciales viven en `~/.claude/telegram-claude-ia.json`.
-Si faltaran, el aviso cae a «Mensajes guardados»: no notifica, pero no se pierde.
-Para rehacerlo:
+Ese bot no es de este proyecto: es el canal por el que los agentes de IA le
+escriben desde cualquier sesión —Claude y Codex—, y sus credenciales viven en
+`~/.config/avisar-juanjo/config.json`. Si faltaran, el aviso cae a «Mensajes
+guardados»: no notifica, pero no se pierde. Para rehacerlo:
 
     python3 ~/.claude/scripts/crear-bot-claude.py
 
@@ -43,7 +43,7 @@ BOT_ANTIGUO = Path.home() / ".claude" / "telegram-claude-ia.json"
 
 
 def _bot() -> dict:
-    """Las credenciales del bot «Claude IA», que es el canal de todo lo mío.
+    """Las credenciales del bot «Agentes IA», que es el canal de todo lo mío.
 
     Vive fuera de este repositorio, en ~/.claude/, porque no es de este proyecto:
     es por donde Claude le escribe a Juanjo desde cualquier sesión. Si algún día
