@@ -62,6 +62,8 @@ INCLUIR = [
     "doc/development/rest-api.md",
     "doc/development/scorm12-runtime-contract.md",
     "doc/development/styles.md",
+    "public/CHANGELOG.md",           # qué trae cada versión: se pregunta en cada salida
+    "public/files/perm/idevices/base/lomloe/README.md",   # el iDevice de currículo
 ]
 
 # Documentación que se deja fuera a propósito. Está aquí escrita, y no solo
@@ -81,7 +83,31 @@ EXCLUIR = [
     "doc/development/profiling.md",        # instrumentación para depurar
     "doc/development/testing.md",          # cómo ejecutar las pruebas
     "doc/development/version-control.md",  # estrategia de ramas
+    "public/app/**/*.md",            # librerías empaquetadas dentro de la aplicación
+    "public/libs/**/*.md",           # ídem, con sus changelogs y licencias
+    "public/files/perm/idevices/base/lomloe/ES-VC-descriptors-alignment.md",  # dataset
 ]
+
+# El ecosistema alrededor del programa. Lo más preguntado del grupo no es cómo se
+# usa eXeLearning, que el manual cubre bien, sino cómo se saca el contenido de él
+# y se pone donde el alumnado lo use: los plugins de Moodle, el visor, las
+# utilidades. Nada de eso vive en el repositorio principal.
+#
+# El criterio para elegir qué se trae de cada uno es el mismo de siempre: lo que
+# explica qué hace la herramienta y cómo se usa, no cómo se colabora en su
+# repositorio. Las rutas están en `repos_complementarios`, en config.json; el que
+# no esté configurado se salta con un aviso.
+COMPLEMENTARIOS = {
+    "mod_exescorm": ["README.md", "CHANGELOG.md"],
+    "mod_exeweb": ["README.md", "CHANGELOG.md"],
+    "wp-exelearning": ["README.md", "docs/SHORTCODES.md", "docs/HOOKS.md",
+                       "docs/architecture/README.md"],
+    "exeviewer": ["README_es.md", "CHANGELOG.md"],
+    "execonvert": ["README.md", "CHANGELOG.md"],
+    "edex": ["README.md"],
+    "hackexe4": ["README.md"],
+    "visor-webzip": ["README.md"],
+}
 
 # Las decisiones de arquitectura explican por qué el programa hace lo que hace,
 # pero son veinte archivos cortos: como fuentes sueltas se pisan entre ellas, así
@@ -124,27 +150,36 @@ def huella(texto: str) -> str:
     return hashlib.sha256(texto.encode("utf-8")).hexdigest()
 
 
-def titulo_de(ruta_relativa: str) -> str:
+def titulo_de(ruta_relativa: str, prefijo: str = "exelearning") -> str:
     """doc/elpx-format/idevices/catalog.md → exelearning-doc-elpx-format-idevices-catalog.md
 
     Los nombres se aplanan porque NotebookLM no tiene carpetas: el título es lo
-    único que sitúa un documento, así que conserva la ruta.
+    único que sitúa un documento, así que conserva la ruta. El prefijo dice de
+    qué repositorio viene, que es lo que distingue el programa de su ecosistema.
     """
-    return "exelearning-" + ruta_relativa[:-3].replace("/", "-") + ".md"
+    return f"{prefijo}-" + ruta_relativa[:-3].replace("/", "-") + ".md"
 
 
-def reunir_documentos(repo: Path) -> dict[str, str]:
-    """Devuelve {título: contenido} de todo lo que debe estar en el cuaderno."""
+def recoger(repo: Path, patrones: list[str], prefijo: str) -> dict[str, str]:
+    """{título: contenido} de los patrones que se resuelven dentro de un repositorio."""
     documentos = {}
-
-    for patron in INCLUIR:
+    for patron in patrones:
         rutas = sorted(repo.glob(patron)) if "*" in patron else [repo / patron]
         for ruta in rutas:
             if not ruta.is_file():
-                registrar(f"  aviso: no existe {ruta.relative_to(repo)}")
+                registrar(f"  aviso: no existe {prefijo}:{patron}")
                 continue
             relativa = str(ruta.relative_to(repo))
-            documentos[titulo_de(relativa)] = ruta.read_text(encoding="utf-8")
+            documentos[titulo_de(relativa, prefijo)] = ruta.read_text(encoding="utf-8")
+    return documentos
+
+
+def reunir_documentos(repo: Path, extras: dict[str, Path]) -> dict[str, str]:
+    """Devuelve {título: contenido} de todo lo que debe estar en el cuaderno."""
+    documentos = recoger(repo, INCLUIR, "exelearning")
+
+    for prefijo, ruta_repo in extras.items():
+        documentos.update(recoger(ruta_repo, COMPLEMENTARIOS[prefijo], prefijo))
 
     for titulo, (patron, encabezado) in CONSOLIDAR.items():
         partes = [f"# {encabezado}\n"]
@@ -167,8 +202,13 @@ def escribir_indice(documentos: dict[str, str], repo: Path) -> tuple[str, str]:
         "# Índice del cuaderno de eXeLearning",
         "",
         f"Documentación técnica de eXeLearning **{version}**, sincronizada desde el",
-        "repositorio oficial. El manual de usuario va aparte, en",
-        "`manual-exelearning-4.0.1.md`.",
+        "repositorio oficial, y la de las herramientas que lo rodean. El manual de",
+        "usuario va aparte, en `manual-exelearning-4.0.1.md`.",
+        "",
+        "Las fuentes llevan el nombre del proyecto por delante: `exelearning-` es el",
+        "programa; `mod_exescorm-`, `mod_exeweb-` y `wp-exelearning-` son los plugins",
+        "con los que se publica; `exeviewer-`, `visor-webzip-`, `edex-`, `execonvert-`",
+        "y `hackexe4-`, las herramientas de alrededor.",
         "",
         "## Cómo usar estas fuentes",
         "",
@@ -178,10 +218,30 @@ def escribir_indice(documentos: dict[str, str], repo: Path) -> tuple[str, str]:
         "  `idevices-catalog` e `idevices-patterns`.",
         "- **Instalación y servidores**: `doc-install`, `doc-deployment`,",
         "  `doc-deploy-README`, `doc-high-availability`.",
-        "- **SCORM en Moodle**: `doc-development-scorm12-runtime-contract`.",
+        "- **Qué trae cada versión, y si un fallo ya está corregido**:",
+        "  `exelearning-public-CHANGELOG`, que llega hasta la última publicada.",
+        "- **Publicar en Moodle**: `mod_exescorm-README` y `mod_exeweb-README` son los",
+        "  plugins oficiales. Cuando alguien dice que su aula virtual rechaza un",
+        "  exportado de la 4.x, casi siempre es que la plataforma lleva la versión",
+        "  antigua del módulo y solo la administración puede actualizarla.",
+        "  El contrato del runtime está en `doc-development-scorm12-runtime-contract`.",
+        "- **Publicar en WordPress**: `wp-exelearning-*`.",
+        "- **Compartir sin aula virtual**: `exeviewer-README_es` (se instala como",
+        "  aplicación y funciona sin conexión) y `visor-webzip-README`.",
+        "- **Estilos propios**: `doc-development-styles` y `edex-README`, el editor.",
+        "- **Convertir entre formatos** (.elp, .elpx, .docx, .md, .pdf):",
+        "  `execonvert-README`.",
+        "- **Ampliar lo que hacen los iDevices** pegando HTML, CSS o JS:",
+        "  `hackexe4-README` y la hoja de HackeXe.",
+        "- **Currículo, competencias y DUA**: el iDevice de fundamentación curricular,",
+        "  en `exelearning-public-files-perm-idevices-base-lomloe-README`.",
         "- **Comportamientos raros pero intencionados**: `KNOWN_ISSUES`,",
         "  `doc-conventions`, `doc-architecture-decisiones`.",
         "- **Al pasar de la 3.x a la 4.x**: `UPGRADE`.",
+        "",
+        "Las rutas que aparecen en la documentación técnica son del árbol de código",
+        "del proyecto. No sirven para quien ha instalado el programa: a esa persona",
+        "hay que responderle con menús y opciones de la aplicación, no con rutas.",
         "",
         "## Fuentes disponibles",
         "",
@@ -190,15 +250,46 @@ def escribir_indice(documentos: dict[str, str], repo: Path) -> tuple[str, str]:
     return "exelearning-indice.md", "\n".join(lineas) + "\n"
 
 
+def actualizar_repo(repo: Path, nombre: str) -> None:
+    """`git pull`, salvo que haya trabajo sin guardar: varios de estos
+    repositorios son de Juanjo y puede estar editándolos ahora mismo."""
+    sucio = subprocess.run(["git", "-C", str(repo), "status", "--porcelain"],
+                           capture_output=True, text=True, timeout=60).stdout.strip()
+    if sucio:
+        registrar(f"  {nombre}: con cambios locales, no se actualiza")
+        return
+    subprocess.run(["git", "-C", str(repo), "pull", "--quiet"], check=False, timeout=300)
+
+
+def repos_complementarios(config: dict) -> dict[str, Path]:
+    """Los del ecosistema que están configurados y existen en el disco."""
+    configurados = config.get("repos_complementarios", {})
+    encontrados = {}
+    for prefijo in COMPLEMENTARIOS:
+        ruta = configurados.get(prefijo)
+        if not ruta:
+            registrar(f"  aviso: {prefijo} no está en repos_complementarios")
+            continue
+        ruta = Path(ruta).expanduser()
+        if not ruta.is_dir():
+            registrar(f"  aviso: {prefijo} no está en el disco ({ruta})")
+            continue
+        encontrados[prefijo] = ruta
+    return encontrados
+
+
 def sincronizar(config: dict, estado: dict, subir: bool) -> int:
     grupo = next(g for g in config["grupos"] if g["prefijo"] == "exelearning")
     cuaderno = grupo["notebook"]
     repo = Path(config["repo_exelearning"]).expanduser()
 
-    registrar("actualizando el repositorio de eXeLearning…")
-    subprocess.run(["git", "-C", str(repo), "pull", "--quiet"], check=False, timeout=300)
+    registrar("actualizando los repositorios…")
+    actualizar_repo(repo, "exelearning")
+    extras = repos_complementarios(config)
+    for prefijo, ruta in extras.items():
+        actualizar_repo(ruta, prefijo)
 
-    documentos = reunir_documentos(repo)
+    documentos = reunir_documentos(repo, extras)
     titulo_indice, contenido_indice = escribir_indice(documentos, repo)
     documentos[titulo_indice] = contenido_indice
 

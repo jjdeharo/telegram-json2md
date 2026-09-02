@@ -5,15 +5,17 @@ eXeLearning, pero con criterio de programador: además del manual de usuario
 lleva la documentación técnica del proyecto, para poder explicar *por qué* el
 programa se comporta como lo hace y no solo *qué* botón pulsar.
 
-Tiene tres clases de fuentes:
+Tiene cuatro clases de fuentes:
 
 1. **Las conversaciones del grupo de Telegram**, que se actualizan solas cada
    día como las de los otros dos grupos.
 2. **El manual de usuario**, consolidado del sitio oficial de CEDEC/INTEF.
 3. **La documentación técnica del repositorio**, sincronizada desde
    `github.com/exelearning/exelearning`.
+4. **La documentación del ecosistema**: los plugins con los que se publica
+   (Moodle y WordPress), el visor y las utilidades.
 
-Los dos últimos los mantiene `scripts/exelearning.py`.
+Los tres últimos los mantiene `scripts/exelearning.py`.
 
 ## Qué documentación entra y cuál no
 
@@ -25,7 +27,8 @@ es la referencia autorizada de qué hace cada uno y cómo guarda su estado—, l
 arquitectura, las decisiones de arquitectura (ADR), las convenciones, la
 instalación y el despliegue, la API REST, la autenticación, el tiempo real, la
 personalización y estilos, el contrato del runtime SCORM 1.2, los problemas
-conocidos y la guía de actualización de la 3.x a la 4.x.
+conocidos, la guía de actualización de la 3.x a la 4.x, el registro de cambios de
+cada versión y el iDevice de fundamentación curricular LOMLOE.
 
 **No entra** lo que solo explica cómo se colabora en el repositorio: cómo abrir
 un pull request, la estrategia de ramas, cómo ejecutar las pruebas, el entorno
@@ -38,6 +41,37 @@ las respuestas y acabar diciéndole a un profesor que siga las convenciones de
 commits del proyecto.
 
 La lista concreta está en `INCLUIR`, dentro de `scripts/exelearning.py`.
+
+## El ecosistema, y por qué está aquí
+
+Lo que más se pregunta en el grupo no es cómo se usa eXeLearning —el manual lo
+cubre bien— sino **cómo se saca el contenido del programa y se pone donde el
+alumnado lo use**. En los cinco meses hasta septiembre de 2026, SCORM se
+mencionó 67 veces y Moodle 46, las plataformas educativas (EducaMadrid, EDIXGAL,
+EducaAnd, Procomún) 43, eXeViewer 39 y las utilidades 31. Nada de eso vive en el
+repositorio del programa, así que el cuaderno no podía responderlo.
+
+Por eso se sincronizan también, cada uno con sus documentos elegidos en
+`COMPLEMENTARIOS`, dentro de `scripts/exelearning.py`:
+
+| Prefijo | Qué es | Para qué responde |
+|---|---|---|
+| `mod_exescorm-`, `mod_exeweb-` | Plugins de Moodle | Un aula virtual que rechaza un exportado de la 4.x casi siempre lleva el módulo antiguo |
+| `wp-exelearning-` | Plugin de WordPress | Publicar y editar REA desde WordPress |
+| `exeviewer-` | eXeViewer | Compartir sin aula virtual; se instala como aplicación y funciona sin conexión |
+| `visor-webzip-` | Visor Web-ZIP | Lo mismo, con fechas de apertura y cierre |
+| `edex-` | Editor de estilos EdEX | Estilos propios, y convertir los de la 2.x |
+| `execonvert-` | eXeConvert | Convertir entre `.elp`, `.elpx`, `.docx`, `.md` y `.pdf` |
+| `hackexe4-` | HackeXe4 | Ampliar los iDevices pegando HTML, CSS o JS |
+
+Las rutas están en `repos_complementarios`, en `config.json`; el que no esté
+configurado o no esté en el disco se salta con un aviso, sin romper la pasada.
+De estos repositorios **no se busca documentación nueva**: serían decenas de
+archivos y casi todos de desarrollo. Solo se comprueba que lo elegido siga
+existiendo.
+
+Antes de cada pasada se hace `git pull` de todos, pero **solo si no tienen
+trabajo sin guardar**: varios son de Juanjo y puede estar editándolos.
 
 ## Uso
 
@@ -75,8 +109,18 @@ una a la otra:
 
 - **Sincronizar** compara las huellas de una lista fija de rutas. Nunca mira
   fuera de la lista, así que jamás vería aparecer una carpeta nueva.
-- **Revisar** recorre los 86 `.md` del repositorio y los cruza contra `INCLUIR` y
+- **Revisar** recorre los `.md` del repositorio y los cruza contra `INCLUIR` y
   `EXCLUIR`. No mira contenidos: solo busca lo que no está en ninguna lista.
+
+Y la revisión solo encuentra donde mira. `FUERA`, en
+`scripts/revisar-exelearning.py`, dejaba fuera la carpeta `public/` entera por
+ser código y recursos, y con ella quedó invisible `public/CHANGELOG.md`: el
+registro de qué trae cada versión, que es exactamente lo que se pregunta cada vez
+que sale una («acabo de instalar la 4.0.3, ¿qué mejoras trae?», 6 de agosto de
+2026). El informe decía «la lista está completa» y era verdad dentro de su
+alcance. Desde septiembre de 2026 `FUERA` son **prefijos de ruta** en vez de
+carpetas de primer nivel, así que de `public/` solo se descartan las librerías
+empaquetadas (`public/app/`, `public/libs/`) y lo demás se ve.
 
 `scripts/revisar-exelearning.py` no cambia nada y deja un informe en
 `registro/revision-exelearning-YYYY-MM.md` con:

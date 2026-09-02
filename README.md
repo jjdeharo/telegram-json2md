@@ -8,8 +8,10 @@ se ha hablado en su grupo.
 **Se actualiza solo, cada día**: el ordenador exporta el día anterior, lo añade
 al archivo del mes en curso y refresca la fuente del notebook correspondiente.
 
-El cuaderno de eXeLearning lleva además el manual de usuario y la documentación
-técnica del proyecto, que se sincronizan desde su repositorio en la misma pasada
+El cuaderno de eXeLearning lleva además el manual de usuario, la documentación
+técnica del proyecto y la de las herramientas que lo rodean —los plugins de
+Moodle y WordPress, el visor, las utilidades—, que se sincronizan desde sus
+repositorios en la misma pasada
 —ver [docs/cuaderno-exelearning.md](docs/cuaderno-exelearning.md)—.
 
 | Grupo | Telegram | Carpeta de salida |
@@ -66,7 +68,7 @@ scripts/
   procesar_telegram.py  la conversión en sí: hilos, días, formato
   notebook.py           alta y baja de fuentes en NotebookLM
   podar.py              comprime exportaciones viejas y acota el estado
-  exelearning.py        sincroniza la documentación de eXeLearning con su cuaderno
+  exelearning.py        sincroniza la documentación de eXeLearning y su ecosistema
   manual_exelearning.py consolida el manual de usuario web en un solo Markdown
   revisar-exelearning.py busca documentación nueva que aún no está decidida
   decidir-exelearning.py clasifica sola esa documentación nueva y deja constancia
@@ -81,7 +83,7 @@ docs/                   cómo funciona el automatismo y qué formato produce
 skills/                 instrucciones para que una IA opere todo esto:
   memoria-telegram        el archivado diario de las conversaciones
   cuaderno-exelearning    la revisión mensual de la documentación técnica
-config.json             credenciales y grupos (NO se versiona)
+config.json             credenciales, grupos y repositorios (NO se versiona)
 config.json.ejemplo     plantilla de lo anterior
 datos/    salida/       exportaciones y conversaciones (NO se versionan)
 material/               manual y documentación preparados para NotebookLM (NO se versiona)

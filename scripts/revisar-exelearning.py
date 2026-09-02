@@ -34,17 +34,25 @@ INFORME = BASE / "registro" / f"revision-exelearning-{date.today():%Y-%m}.md"
 # Carpetas del repositorio que no contienen documentación del programa: código,
 # recursos, pruebas, y todo lo oculto (instrucciones de agentes, plantillas de
 # GitHub), que va dirigido a quien desarrolla y no a quien usa eXeLearning.
-FUERA = ("node_modules", ".git", "test", "public", "tools", "views", "translations")
+#
+# Son prefijos de ruta, no carpetas de primer nivel, y esa distinción importa:
+# `public/` estuvo entero fuera de la revisión y con él quedó invisible
+# `public/CHANGELOG.md`, que es lo que responde a «acabo de instalar la 4.0.3,
+# ¿qué trae?». Lo que sobra de `public/` son las librerías empaquetadas, no todo.
+FUERA = ("node_modules/", ".git/", "test/", "tools/", "views/", "translations/",
+         "public/app/", "public/libs/")
 
 
 def documentacion_del_repo(repo: Path) -> list[str]:
     """Los .md del repositorio que son candidatos a entrar en el cuaderno."""
     encontrados = []
     for ruta in repo.rglob("*.md"):
-        partes = ruta.relative_to(repo).parts
-        if partes[0] in FUERA or any(p.startswith(".") for p in partes[:-1]):
+        relativa = ruta.relative_to(repo)
+        if relativa.as_posix().startswith(FUERA):
             continue
-        encontrados.append(str(ruta.relative_to(repo)))
+        if any(p.startswith(".") for p in relativa.parts[:-1]):
+            continue
+        encontrados.append(str(relativa))
     return sorted(encontrados)
 
 
@@ -79,9 +87,14 @@ def main() -> int:
     excluidos = sorted(expandir(repo, exelearning.EXCLUIR) - set(incluidos))
     sin_decidir = [r for r in todos if r not in incluidos and r not in excluidos]
 
-    # Entradas de INCLUIR que ya no encuentran ningún archivo
+    # Entradas que ya no encuentran ningún archivo, aquí y en el ecosistema. De
+    # los repositorios complementarios no se buscan documentos nuevos —serían
+    # decenas y casi todos de desarrollo—, pero sí que lo elegido siga estando.
     huerfanos = [p for p in exelearning.INCLUIR
                  if "*" not in p and not (repo / p).is_file()]
+    for prefijo, ruta_repo in exelearning.repos_complementarios(config).items():
+        huerfanos += [f"{prefijo}:{p}" for p in exelearning.COMPLEMENTARIOS[prefijo]
+                      if "*" not in p and not (ruta_repo / p).is_file()]
 
     # ¿Hay un manual nuevo? Se compara la portada con la de la última revisión.
     estado_ruta = BASE / "estado.json"
@@ -126,10 +139,10 @@ def main() -> int:
 
     if huerfanos:
         lineas += [
-            "## Entradas de `INCLUIR` que ya no existen",
+            "## Entradas que ya no existen",
             "",
-            "El archivo se ha borrado o renombrado en el repositorio. Quítalas de la",
-            "lista, o apunta a su nueva ruta.",
+            "El archivo se ha borrado o renombrado en su repositorio. Quítalas de",
+            "`INCLUIR` o de `COMPLEMENTARIOS`, o apunta a su nueva ruta.",
             "",
         ] + [f"- `{r}`" for r in huerfanos] + [""]
 

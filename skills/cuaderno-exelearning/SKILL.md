@@ -7,10 +7,13 @@ description: Mantiene la documentación técnica y el manual del cuaderno de Not
 
 El cuaderno **Karla - Experta en eXeLearning** responde a usuarios de
 eXeLearning con criterio de programador: lleva el manual de usuario, la
-documentación técnica del proyecto y las conversaciones del grupo de Telegram.
+documentación técnica del proyecto, la de las herramientas que lo rodean
+—plugins de Moodle y WordPress, visores, utilidades— y las conversaciones del
+grupo de Telegram.
 
 Repositorio del automatismo: `~/Documentos/github/automatizaciones/memoria-telegram`
 Repositorio de eXeLearning: la ruta está en `config.json`, en `repo_exelearning`.
+Los del ecosistema, en `repos_complementarios` del mismo archivo.
 
 Las conversaciones y la sincronización de la documentación **corren solas cada
 día**. Esta skill es para comprobar lo que se decidió solo, y para corregir el criterio
@@ -24,12 +27,18 @@ cuando algo se clasifique mal.
 | Detectar que la lista se ha quedado corta | `scripts/revisar-exelearning.py` | Cada día, solo |
 | Decidir qué hacer con lo que aparece | `scripts/decidir-exelearning.py` (un Claude sin sesión) | Detrás de la revisión, solo |
 | **Comprobar lo decidido y el criterio** | **Tú, con esta skill** | Cuando quieras, o si algo chirría |
+| **Leer el grupo y ver qué falta** | **Tú, con esta skill** | Nadie más puede: ningún script lee las preguntas |
 | Rehacer el manual de usuario | `scripts/manual_exelearning.py` | Cuando salga uno nuevo |
 
 Esto no es una separación caprichosa. Entre mayo y septiembre de 2026 apareció
 en el repositorio todo el subárbol `doc/elpx-format/` —37.500 palabras sobre el
 formato de archivo, incluido el catálogo de iDevices— y el cuaderno no se enteró,
 porque un script con una lista fija sincroniza lo que le dijeron y nada más.
+
+Y hay un tercer hueco que ninguno de los dos cubre: **lo que el grupo pregunta y
+no está en ningún repositorio que se mire**. Eso solo se ve leyendo las
+conversaciones, y es lo que llevó en septiembre de 2026 a añadir el ecosistema.
+Ver «Leer el grupo para saber qué falta», más abajo.
 
 ## Lo primero: ¿ha actuado alguna vez?
 
@@ -115,6 +124,43 @@ instrucciones dirigidas a quien desarrolla el proyecto y volvió a entrar.
 
 6. **Commit** de los cambios en las listas, con el porqué de cada decisión.
 
+## Leer el grupo para saber qué falta
+
+La revisión automática compara repositorios contra listas. Nunca puede decirte
+que **falta un repositorio entero**, porque no sabe que existe. Eso solo sale de
+leer lo que la gente pregunta:
+
+```bash
+cd salida/exelearning
+grep -inE "karla" conversacion-2026-0[4-9].md      # dónde falló Karla, textualmente
+grep -h "?" conversacion-2026-0[4-5].md | sed 's/^> ↩︎ //' | sort -u  # las preguntas
+```
+
+Dos cosas que buscar, y en este orden:
+
+1. **Las menciones a Karla.** La gente dice en el grupo cuándo no le ha servido:
+   «una duda y Karla no ha sabido responderla», «le consulté a Karla pero me da
+   otras opciones». Cada una apunta a una laguna concreta y comprobable: en
+   septiembre de 2026 había cuatro y las cuatro se explicaban por una fuente que
+   no estaba (los FX no se pueden anidar, y `anidad` sale 0 veces en el manual;
+   la importación de preguntas desde `.txt`, y `.txt` sale 0 veces).
+2. **De qué se habla, contado.** Un `grep -c` por temas sobre cinco meses dice
+   más que la impresión de leerlos. Así se vio que el grupo no pregunta tanto
+   *cómo se usa* eXeLearning como *cómo se saca el contenido de él*: SCORM 67,
+   Moodle 46, plataformas educativas 43, eXeViewer 39, utilidades 31.
+
+Antes de dar por buena una laguna, compruébala contra las fuentes que ya hay
+(`grep -ci` en `material/exelearning/manual-exelearning-4.0.1.md` y compañía). La
+mitad de las veces la respuesta sí está y el problema es otro.
+
+**Una laguna que no se arregla con fuentes**: en junio de 2026 alguien preguntó
+por los iconos del estilo Predeterminado y Karla le dio una ruta del árbol de
+código a alguien que solo tiene el programa instalado. Es la misma contaminación
+que se evita excluyendo `AGENTS.md`, pero por la vía de la documentación técnica
+legítima. El índice del cuaderno lo advierte desde septiembre de 2026; si vuelve
+a pasar, lo que hay que tocar son las instrucciones del cuaderno en NotebookLM,
+a mano, no la lista de fuentes.
+
 ## Reglas que no debes romper
 
 1. **Subir siempre Markdown, nunca `.docx` ni PDF convertido.** La primera
@@ -125,7 +171,8 @@ instrucciones dirigidas a quien desarrolla el proyecto y volvió a entrar.
    vieja.** Nunca al revés. Ya lo hace `scripts/notebook.py`; úsalo.
 3. **No toques lo que el script no gestiona**: los PDF pedagógicos
    (`guia_rea_exe.pdf`, requisitos de calidad de las SdA) y la hoja de HackeXe
-   los puso Juanjo a mano y se quedan.
+   (`HackeXe4 - Hoja 1`) los puso Juanjo a mano y se quedan. El
+   `hackexe4-README.md` es otra fuente distinta y esa sí la lleva el script.
 4. **Las conversaciones del grupo son otra cosa**: las lleva la skill
    `memoria-telegram`. No las toques desde aquí.
 

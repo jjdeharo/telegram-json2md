@@ -2,6 +2,16 @@
   "api_id": "TU_API_ID",
   "api_hash": "TU_API_HASH",
   "repo_exelearning": "RUTA_AL_REPO_DE_EXELEARNING",
+  "repos_complementarios": {
+    "mod_exescorm": "RUTA_AL_CLON_DE_exelearning/mod_exescorm",
+    "mod_exeweb": "RUTA_AL_CLON_DE_exelearning/mod_exeweb",
+    "wp-exelearning": "RUTA_AL_CLON_DE_exelearning/wp-exelearning",
+    "exeviewer": "RUTA_AL_CLON_DE_exelearning/exeviewer",
+    "execonvert": "RUTA_AL_REPO_DE_eXeConvert",
+    "edex": "RUTA_AL_REPO_DE_exe-style-editor.github.io",
+    "hackexe4": "RUTA_AL_REPO_DE_hackexe4",
+    "visor-webzip": "RUTA_AL_REPO_DE_visor-webzip.github.io"
+  },
   "grupos": [
     {
       "usuario": "ChatGPTedu",
