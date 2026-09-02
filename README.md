@@ -70,6 +70,7 @@ scripts/
   manual_exelearning.py consolida el manual de usuario web en un solo Markdown
   revisar-exelearning.py busca documentación nueva que aún no está decidida
   decidir-exelearning.py clasifica sola esa documentación nueva y deja constancia
+  comprobar-cli.py      avisa si sale una versión nueva del CLI de NotebookLM
   avisar.sh             avisos en pantalla
   diario.sh             la pasada diaria, tal como la lanza cron
   instalar.sh           instala o retira el disparo en el crontab

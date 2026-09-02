@@ -98,6 +98,9 @@ if python3 "$BASE/scripts/actualizar.py"; then
   # La marca se pone solo si la pasada terminó bien. Si falló, los disparos del
   # cuarto de hora seguirán reintentando: un corte de red pasajero se arregla
   # solo sin que nadie tenga que enterarse.
+  # Y por último, si ha salido versión nueva del CLI de NotebookLM. Va al final y
+  # sin condicionar nada: es un aviso, no una tarea.
+  python3 "$BASE/scripts/comprobar-cli.py" || true
   touch "$MARCA"
   find "$REGISTRO" -maxdepth 1 -name '.hecho-*' -mtime +7 -delete
   find "$REGISTRO" -maxdepth 1 -name 'diario-*.log' -mtime +60 -delete

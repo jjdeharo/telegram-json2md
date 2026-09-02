@@ -87,6 +87,7 @@ Mira siempre primero `registro/diario-<fecha>.log`.
 | Síntoma | Solución |
 |---|---|
 | `la sesión de NotebookLM ha caducado` | `notebooklm login` (necesita navegador: pídeselo a Juanjo con `!` si no puedes) |
+| Nada funciona con NotebookLM y la sesión es válida | El CLI es una herramienta no oficial y puede romperse cuando Google cambia algo. Mira si hay versión nueva (`python3 scripts/comprobar-cli.py`) y actualiza siguiendo `docs/automatizacion.md` |
 | `La sesión de Telegram no está autorizada` | Borrar `sesion/telegram.session` y ejecutar `actualizar.py` a mano: pedirá el código por Telegram |
 | Un mes duplicado en el notebook | Se arregla solo en la siguiente pasada; si urge, borra la fuente más antigua de ese título |
 | Un grupo falla y los otros no | Es lo previsto. Reintenta ese grupo con `--solo <prefijo>` |

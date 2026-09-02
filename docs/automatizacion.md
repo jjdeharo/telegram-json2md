@@ -112,6 +112,7 @@ acotado, y de ello se encarga `scripts/podar.py` al final de cada pasada:
 | `registro/diario-*.log` | 60 días |
 | `registro/.hecho-*` | 7 días |
 | `registro/disparos.log` | Las últimas 200 líneas |
+| `registro/exelearning-sync.log` | Se reescribe en cada pasada |
 | El repositorio git | Solo código: no crece con los datos |
 
 Las exportaciones antiguas se comprimen en vez de borrarse porque son la única
@@ -136,8 +137,14 @@ una herramienta **no oficial**: automatiza NotebookLM reutilizando las cookies d
 la sesión de Google, así que un cambio en NotebookLM puede romperla cualquier
 día. Si eso pasa, saldrá como cartel en pantalla y quedará en `registro/`.
 
-Por lo mismo, después de actualizarla conviene comprobar que el automatismo sigue
-en pie, y no darlo por hecho:
+Publica una versión estable cada pocas semanas. La pasada diaria comprueba si ha
+salido una y **avisa una sola vez por versión**, pero no actualiza sola: la
+actualización es la parte arriesgada y hay que comprobarla después. Lo que
+interesa de ese aviso no son las novedades, sino que cuando esto se rompa el
+arreglo llegará precisamente así.
+
+Después de actualizar, comprobar que el automatismo sigue en pie, sin darlo por
+hecho:
 
 ```bash
 uv tool upgrade notebooklm-py
