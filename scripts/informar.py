@@ -76,7 +76,14 @@ def informar(texto: str) -> bool:
         f.write(f"{marca}  {texto.splitlines()[0]}\n")
 
     try:
-        asyncio.run(_enviar(mensaje))
+        with open(CONFIG, encoding="utf-8") as f:
+            bot = json.load(f).get("bot_avisos") or {}
+        if bot.get("token") and bot.get("chat_id"):
+            _por_bot(mensaje, bot)
+        else:
+            # Sin bot no hay notificación —Telegram no avisa de lo que uno se
+            # escribe a sí mismo—, pero el aviso no se pierde.
+            asyncio.run(_enviar(mensaje))
         return True
     except Exception as error:  # noqa: BLE001
         with open(BITACORA, "a", encoding="utf-8") as f:
