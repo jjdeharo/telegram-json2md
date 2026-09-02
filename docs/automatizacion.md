@@ -128,6 +128,27 @@ También se puede podar suelto:
 python3 scripts/podar.py
 ```
 
+## De qué depende esto
+
+Todo el trato con NotebookLM pasa por el CLI `notebooklm`, del paquete
+[`notebooklm-py`](https://github.com/teng-lin/notebooklm-py) (Teng Lin, MIT). Es
+una herramienta **no oficial**: automatiza NotebookLM reutilizando las cookies de
+la sesión de Google, así que un cambio en NotebookLM puede romperla cualquier
+día. Si eso pasa, saldrá como cartel en pantalla y quedará en `registro/`.
+
+Por lo mismo, después de actualizarla conviene comprobar que el automatismo sigue
+en pie, y no darlo por hecho:
+
+```bash
+uv tool upgrade notebooklm-py
+notebooklm skill install          # el skill viene dentro del propio paquete
+notebooklm auth check --test --json
+python3 scripts/actualizar.py --sin-subir
+python3 scripts/exelearning.py --sin-subir
+```
+
+Si algo falla, se vuelve atrás con `uv tool install notebooklm-py==<versión>`.
+
 ## Cuando algo va mal
 
 Lo primero, el registro del día: `registro/diario-<fecha>.log`. Y `disparos.log`

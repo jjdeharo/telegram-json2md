@@ -61,7 +61,7 @@ esperar() {   # esperar <descripción> <segundos> <orden...>
   [ "$t" -gt 0 ] && printf '%s  %s disponible tras %ss\n' "$(date '+%F %T')" "$que" "$t"
   return 0
 }
-esperar "red" 300 getent hosts notebooklm.google.com || true
+esperar "red" 300 getent hosts notebook.google.com || true
 esperar "sesión gráfica" 120 xset q || true
 
 # La documentación de eXeLearning va aparte de las conversaciones y cambia a su
