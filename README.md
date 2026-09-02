@@ -80,6 +80,7 @@ scripts/
   instalar.sh           instala o retira el disparo en el crontab
 web/                    conversor JSON → Markdown en el navegador, sin instalar nada
 docs/                   cómo funciona el automatismo y qué formato produce
+fuentes/                documentos escritos a mano que van al cuaderno de eXeLearning
 skills/                 instrucciones para que una IA opere todo esto:
   memoria-telegram        el archivado diario de las conversaciones
   cuaderno-exelearning    la revisión mensual de la documentación técnica

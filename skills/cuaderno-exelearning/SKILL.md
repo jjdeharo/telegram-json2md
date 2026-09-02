@@ -153,6 +153,25 @@ Antes de dar por buena una laguna, compruébala contra las fuentes que ya hay
 (`grep -ci` en `material/exelearning/manual-exelearning-4.0.1.md` y compañía). La
 mitad de las veces la respuesta sí está y el problema es otro.
 
+### Cuando la laguna no la cubre ningún repositorio
+
+Pasa a menudo: lo que se pregunta no es sobre eXeLearning sino sobre **la
+plataforma donde se publica**, y esa documentación no se puede traer —MoodleDocs
+responde «Moodle challenge» a todo lo que no sea un navegador— o traerla entera
+dispersaría la recuperación.
+
+Para eso está `fuentes/`, versionada: los `.md` que haya ahí se suben con su
+propio nombre. Se escribe a mano y con dos reglas:
+
+1. **Cada afirmación dice de dónde sale**, con autor y fecha, distinguiendo al
+   equipo de eXeLearning de un usuario contando su experiencia.
+2. **Lo rectificado se escribe rectificado.** El cuaderno tiene las
+   conversaciones enteras, con los errores y sus correcciones; si el documento no
+   dice cuál venció, no sirve de nada.
+
+Enséñaselo a Juanjo antes de subirlo: es contenido escrito, no sincronizado, y
+un error aquí se propaga a todas las respuestas.
+
 **Una laguna que no se arregla con fuentes**: en junio de 2026 alguien preguntó
 por los iconos del estilo Predeterminado y Karla le dio una ruta del árbol de
 código a alguien que solo tiene el programa instalado. Es la misma contaminación

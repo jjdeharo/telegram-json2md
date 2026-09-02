@@ -14,6 +14,8 @@ Tiene cuatro clases de fuentes:
    `github.com/exelearning/exelearning`.
 4. **La documentación del ecosistema**: los plugins con los que se publica
    (Moodle y WordPress), el visor y las utilidades.
+5. **Los documentos escritos a mano**, en `fuentes/`, para lo que se pregunta y
+   no está documentado en ningún repositorio.
 
 Los tres últimos los mantiene `scripts/exelearning.py`.
 
@@ -94,6 +96,39 @@ falta actualizarlo a mano. La ruta está en `config.json`, en `repo_exelearning`
 
 Los PDF pedagógicos (`guia_rea_exe.pdf`, requisitos de calidad de las SdA) y la
 hoja de HackeXe no los gestiona el script: se quedan como estén.
+
+## Los documentos escritos a mano
+
+En `fuentes/` van los documentos que no salen de ningún repositorio porque nadie
+los ha escrito: los redacta quien mantiene el cuaderno. Todo `.md` que haya ahí
+se sube con su propio nombre.
+
+Están **versionados**, y no en `material/`, precisamente porque no se generan de
+nada: si se perdieran no habría forma de rehacerlos, y así además queda su
+historia y se pueden revisar los cambios en un diff.
+
+Hoy hay uno, `exelearning-en-cada-plataforma.md`, y responde a la laguna más
+grande que tenía el cuaderno: **buena parte de lo que se pregunta no es sobre
+eXeLearning sino sobre la plataforma donde se publica**. Entre noviembre de 2025
+y septiembre de 2026, Moodle se mencionó 97 veces (33 de ellas en preguntas),
+Procomún 24, EducaMadrid 20 y la Junta de Andalucía 20.
+
+La documentación de esas plataformas no se puede sincronizar: MoodleDocs devuelve
+un «Moodle challenge» a cualquier petición que no venga de un navegador, y volcar
+la documentación de cinco plataformas dispersaría la recuperación en vez de
+mejorarla. Así que el documento es una **síntesis**: reúne lo que en las
+conversaciones está disperso —una respuesta del equipo de eXeLearning en un
+mensaje suelto de junio— y lo fecha.
+
+Dos reglas al escribir ahí:
+
+1. **Cada afirmación dice de dónde sale**, con autor y fecha, y distingue al
+   equipo de eXeLearning de un usuario que cuenta su experiencia. Sin eso, dentro
+   de un año nadie sabrá si algo era un dato o una conjetura.
+2. **Lo que quedó rectificado se escribe rectificado.** En el hilo del 19 de
+   agosto de 2026 se dijo primero que SCORM no lleva botones de navegación y
+   luego se demostró que Moodle sí los muestra. Vale lo segundo, y el documento
+   lo dice, porque el cuaderno tiene las dos versiones en las conversaciones.
 
 ## La revisión: ¿ha aparecido documentación nueva?
 

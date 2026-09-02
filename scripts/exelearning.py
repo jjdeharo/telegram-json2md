@@ -30,6 +30,11 @@ import notebook  # noqa: E402
 CONFIG = BASE / "config.json"
 ESTADO = BASE / "estado.json"
 MATERIAL = BASE / "material" / "exelearning"
+# Documentos escritos a mano que van al cuaderno. Van versionados, no en
+# `material/`, porque no se generan de nada: si se pierden, se pierden. Cubren lo
+# que se pregunta y no está documentado en ningún repositorio, como qué hace cada
+# plataforma con un contenido de eXeLearning.
+FUENTES = BASE / "fuentes"
 AVISAR = BASE / "scripts" / "avisar.sh"
 
 # Qué documentación entra en el cuaderno. El criterio es una sola pregunta:
@@ -226,6 +231,10 @@ def escribir_indice(documentos: dict[str, str], repo: Path) -> tuple[str, str]:
         "  antigua del módulo y solo la administración puede actualizarla.",
         "  El contrato del runtime está en `doc-development-scorm12-runtime-contract`.",
         "- **Publicar en WordPress**: `wp-exelearning-*`.",
+        "- **Qué hace cada plataforma con un contenido de eXeLearning** (Moodle,",
+        "  Procomún, EducaMadrid, Junta de Andalucía, GitHub Pages):",
+        "  `exelearning-en-cada-plataforma`, que es donde está reunido y fechado lo",
+        "  que en las conversaciones aparece disperso.",
         "- **Compartir sin aula virtual**: `exeviewer-README_es` (se instala como",
         "  aplicación y funciona sin conexión) y `visor-webzip-README`.",
         "- **Estilos propios**: `doc-development-styles` y `edex-README`, el editor.",
@@ -297,6 +306,10 @@ def sincronizar(config: dict, estado: dict, subir: bool) -> int:
     MATERIAL.mkdir(parents=True, exist_ok=True)
     for manual in MATERIAL.glob("manual-*.md"):
         documentos[manual.name] = manual.read_text(encoding="utf-8")
+
+    # Y los documentos escritos a mano, que sí están versionados.
+    for propia in sorted(FUENTES.glob("*.md")):
+        documentos[propia.name] = propia.read_text(encoding="utf-8")
 
     registrar(f"{len(documentos)} documentos deben estar en el cuaderno")
 
