@@ -2,7 +2,15 @@
 
 Este repositorio archiva las conversaciones de tres grupos de Telegram y
 mantiene con ellas tres notebooks de NotebookLM. Todo el proceso está
-automatizado y descrito en:
+automatizado.
+
+**Si eres una IA que llega nueva, empieza por la skill
+[`skills/memoria-telegram/SKILL.md`](skills/memoria-telegram/SKILL.md)**: lleva
+lo que hay que comprobar, lo que se puede ejecutar y lo que no hay que tocar.
+Está enlazada desde `~/.claude/skills/memoria-telegram`, así que en Claude Code
+aparece sola como `memoria-telegram`.
+
+El detalle está en:
 
 - [README.md](README.md) — qué es, cómo se usa, estructura.
 - [docs/automatizacion.md](docs/automatizacion.md) — el flujo diario y qué hacer

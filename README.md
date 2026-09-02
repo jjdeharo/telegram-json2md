@@ -41,6 +41,14 @@ El detalle del funcionamiento diario está en
 [docs/automatizacion.md](docs/automatizacion.md); el formato del Markdown que se
 genera, en [docs/formato-markdown.md](docs/formato-markdown.md).
 
+Para operarlo con una IA hay una skill lista en
+[`skills/memoria-telegram/`](skills/memoria-telegram/SKILL.md). Enlazándola desde
+la carpeta de skills del agente queda disponible sin más:
+
+```bash
+ln -sfn "$PWD/skills/memoria-telegram" ~/.claude/skills/memoria-telegram
+```
+
 ## Estructura
 
 ```
@@ -55,6 +63,7 @@ scripts/
   instalar.sh           instala o retira el disparo en el crontab
 web/                    conversor JSON → Markdown en el navegador, sin instalar nada
 docs/                   cómo funciona el automatismo y qué formato produce
+skills/memoria-telegram instrucciones para que una IA opere todo esto
 config.json             credenciales y grupos (NO se versiona)
 config.json.ejemplo     plantilla de lo anterior
 datos/    salida/       exportaciones y conversaciones (NO se versionan)
