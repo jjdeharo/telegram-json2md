@@ -21,5 +21,10 @@
       "carpeta": "vibe-coding-educativo",
       "notebook": "ID_DEL_NOTEBOOK"
     }
-  ]
+  ],
+  "bot_avisos": {
+    "usuario": "tu_bot",
+    "token": "TOKEN_DEL_BOT",
+    "chat_id": 0
+  }
 }

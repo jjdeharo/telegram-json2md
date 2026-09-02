@@ -180,9 +180,27 @@ se cuenta por Telegram. Si ese archivo está vacío, es que nunca se ha roto nad
 |---|---|
 | Notificación en pantalla | El progreso de la pasada, si estás delante |
 | Cartel fijo con sonido | Un fallo que nadie ha podido arreglar |
-| **Telegram (Mensajes guardados)** | Lo que hay que contar aunque no estés: actualizaciones, reparaciones, documentación clasificada sola |
+| **Telegram, desde el bot @memoria_jjdeharo_bot** | Lo que hay que contar aunque no estés: actualizaciones, reparaciones, documentación clasificada sola |
 | `registro/avisos.log` | Todo lo enviado, por si Telegram falla |
 | `docs/reparaciones.md` y `docs/decisiones-automaticas.md` | El detalle, versionado |
+
+### Por qué un bot y no «Mensajes guardados»
+
+Telegram **no notifica los mensajes que uno se escribe a sí mismo**. Los primeros
+avisos iban a «Mensajes guardados» y ahí se quedaban, mudos: llegaban, pero nadie
+se enteraba. Un mensaje de un bot sí suena en el móvil.
+
+El bot se creó desde la propia cuenta hablando con @BotFather
+(`scripts/crear-bot.py`), y su token vive en `config.json`, que no se versiona y
+tiene permisos 600. Si algún día hay que rehacerlo, o montarlo en otro ordenador:
+
+```bash
+python3 scripts/crear-bot.py                    # crearlo desde cero
+python3 scripts/configurar-avisos.py <token>    # o configurar uno ya existente
+```
+
+Si el bot no está configurado, los avisos caen a «Mensajes guardados»: no
+notifican, pero no se pierden. Y pase lo que pase quedan en `registro/avisos.log`.
 
 ## Cuando algo va mal
 

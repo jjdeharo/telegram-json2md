@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
-"""Manda un aviso a los Mensajes guardados de Telegram de Juanjo.
+"""Manda un aviso por Telegram a Juanjo.
 
 Los carteles en pantalla solo sirven si hay alguien delante del ordenador, y esto
 trabaja a las siete de la mañana. Para lo que de verdad hay que contar —que se
 actualizó una herramienta, que se clasificó documentación nueva, que algo se
-rompió— se usa el propio Telegram, que ya está autorizado aquí y le llega al
-móvil.
+rompió— se usa Telegram, que le llega al móvil.
 
-Va a «Mensajes guardados» (el chat con uno mismo): ni molesta a nadie ni depende
-de otro servicio.
+Lo manda **un bot**, y no la cuenta de Juanjo, por un motivo concreto: Telegram no
+notifica los mensajes que uno se escribe a sí mismo, así que un aviso en «Mensajes
+guardados» se queda ahí sin avisar de nada. Un mensaje de un bot sí suena.
+
+Si el bot no está configurado, se cae a «Mensajes guardados»: el aviso queda
+registrado aunque no notifique, que es mejor que perderlo. Para configurarlo:
+
+    python3 scripts/configurar-avisos.py
+
+Uso:
 
     python3 scripts/informar.py "texto del aviso"
     echo "texto" | python3 scripts/informar.py
@@ -19,6 +26,8 @@ from __future__ import annotations
 import asyncio
 import json
 import sys
+import urllib.parse
+import urllib.request
 from datetime import datetime
 from pathlib import Path
 
@@ -26,6 +35,20 @@ BASE = Path(__file__).resolve().parent.parent
 CONFIG = BASE / "config.json"
 SESION = BASE / "sesion" / "telegram"
 BITACORA = BASE / "registro" / "avisos.log"
+
+
+def _por_bot(texto: str, bot: dict) -> None:
+    """Vía la API de bots: un HTTPS y nada más, sin dependencias."""
+    datos = urllib.parse.urlencode({
+        "chat_id": bot["chat_id"], "text": texto, "parse_mode": "Markdown",
+        "disable_web_page_preview": "true",
+    }).encode()
+    peticion = urllib.request.Request(
+        f"https://api.telegram.org/bot{bot['token']}/sendMessage", data=datos)
+    with urllib.request.urlopen(peticion, timeout=60) as r:
+        respuesta = json.load(r)
+    if not respuesta.get("ok"):
+        raise RuntimeError(respuesta.get("description", "error desconocido"))
 
 
 async def _enviar(texto: str) -> None:
@@ -45,9 +68,8 @@ async def _enviar(texto: str) -> None:
 def informar(texto: str) -> bool:
     """Envía el aviso y lo anota. Nunca revienta: un aviso no vale una pasada."""
     marca = f"{datetime.now():%Y-%m-%d %H:%M}"
-    # Negrita en el formato que entiende Telethon; con un solo asterisco
-    # saldría el asterisco literal.
-    mensaje = f"🗂️ **Memoria de Telegram** · {marca}\n\n{texto}"
+    # Negrita en el formato que entienden tanto Telethon como la API de bots.
+    mensaje = f"🗂️ *Memoria de Telegram* · {marca}\n\n{texto}"
 
     BITACORA.parent.mkdir(parents=True, exist_ok=True)
     with open(BITACORA, "a", encoding="utf-8") as f:
