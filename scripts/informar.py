@@ -45,7 +45,9 @@ async def _enviar(texto: str) -> None:
 def informar(texto: str) -> bool:
     """Envía el aviso y lo anota. Nunca revienta: un aviso no vale una pasada."""
     marca = f"{datetime.now():%Y-%m-%d %H:%M}"
-    mensaje = f"🗂️ *Memoria de Telegram* · {marca}\n\n{texto}"
+    # Negrita en el formato que entiende Telethon; con un solo asterisco
+    # saldría el asterisco literal.
+    mensaje = f"🗂️ **Memoria de Telegram** · {marca}\n\n{texto}"
 
     BITACORA.parent.mkdir(parents=True, exist_ok=True)
     with open(BITACORA, "a", encoding="utf-8") as f:
