@@ -44,6 +44,25 @@ python3 scripts/actualizar.py --sin-subir         # generar sin tocar NotebookLM
 Es idempotente: repetirlo no duplica nada. Tarda uno o dos minutos y va avisando
 en pantalla. Nunca procesa el día en curso, solo días terminados.
 
+## El cuaderno de eXeLearning lleva algo más
+
+Ese cuaderno no solo tiene conversaciones: lleva el manual de usuario y la
+documentación técnica del repositorio de eXeLearning, para poder responder con
+criterio de programador. Lo mantiene `scripts/exelearning.py`, que hace `git
+pull` del repositorio y sincroniza (añade lo nuevo, sustituye lo cambiado,
+retira lo que desapareció). Corre solo, después de las conversaciones.
+
+```bash
+python3 scripts/exelearning.py --sin-subir   # ver qué cambiaría
+python3 scripts/exelearning.py               # sincronizar
+python3 scripts/manual_exelearning.py        # rehacer el manual (solo si sale uno nuevo)
+```
+
+Qué entra y qué no está decidido y explicado en `docs/cuaderno-exelearning.md`;
+la lista concreta, en `INCLUIR` dentro del script. **No metas `AGENTS.md` ni
+`CLAUDE.md` del repositorio de eXeLearning**: son instrucciones para una IA que
+toca ese código y se filtran en las respuestas al usuario.
+
 ## Reglas que no debes romper
 
 1. **Nunca versiones datos.** El repositorio es **público** y las conversaciones

@@ -8,6 +8,10 @@ se ha hablado en su grupo.
 **Se actualiza solo, cada día**: el ordenador exporta el día anterior, lo añade
 al archivo del mes en curso y refresca la fuente del notebook correspondiente.
 
+El cuaderno de eXeLearning lleva además el manual de usuario y la documentación
+técnica del proyecto, que se sincronizan desde su repositorio en la misma pasada
+—ver [docs/cuaderno-exelearning.md](docs/cuaderno-exelearning.md)—.
+
 | Grupo | Telegram | Carpeta de salida |
 |---|---|---|
 | ChatGPT-IA-edu | [@ChatGPTedu](https://t.me/ChatGPTedu) | `salida/chatgpt-ia-edu/` |
@@ -28,6 +32,9 @@ python3 scripts/actualizar.py                     # lo pendiente hasta ayer
 python3 scripts/actualizar.py --desde 2026-08-01  # rehacer desde una fecha
 python3 scripts/actualizar.py --solo vceduca      # un solo grupo
 python3 scripts/actualizar.py --sin-subir         # generar sin tocar NotebookLM
+
+python3 scripts/exelearning.py                    # documentación de eXeLearning
+python3 scripts/manual_exelearning.py             # rehacer el manual de usuario
 ```
 
 Instalar o quitar el disparo automático:
@@ -59,15 +66,21 @@ scripts/
   procesar_telegram.py  la conversión en sí: hilos, días, formato
   notebook.py           alta y baja de fuentes en NotebookLM
   podar.py              comprime exportaciones viejas y acota el estado
+  exelearning.py        sincroniza la documentación de eXeLearning con su cuaderno
+  manual_exelearning.py consolida el manual de usuario web en un solo Markdown
+  revisar-exelearning.py revisión mensual: qué documentación nueva hay que decidir
   avisar.sh             avisos en pantalla
   diario.sh             la pasada diaria, tal como la lanza cron
   instalar.sh           instala o retira el disparo en el crontab
 web/                    conversor JSON → Markdown en el navegador, sin instalar nada
 docs/                   cómo funciona el automatismo y qué formato produce
-skills/memoria-telegram instrucciones para que una IA opere todo esto
+skills/                 instrucciones para que una IA opere todo esto:
+  memoria-telegram        el archivado diario de las conversaciones
+  cuaderno-exelearning    la revisión mensual de la documentación técnica
 config.json             credenciales y grupos (NO se versiona)
 config.json.ejemplo     plantilla de lo anterior
 datos/    salida/       exportaciones y conversaciones (NO se versionan)
+material/               manual y documentación preparados para NotebookLM (NO se versiona)
 sesion/   estado.json   sesión de Telegram y última fecha procesada (NO se versionan)
 registro/               registros de cada pasada (NO se versiona)
 ```

@@ -64,7 +64,31 @@ esperar() {   # esperar <descripción> <segundos> <orden...>
 esperar "red" 300 getent hosts notebooklm.google.com || true
 esperar "sesión gráfica" 120 xset q || true
 
+# La documentación de eXeLearning va aparte de las conversaciones y cambia a su
+# propio ritmo, así que se sincroniza siempre, pero un fallo suyo no invalida el
+# archivado del día: se anota y se reintenta mañana.
+sincronizar_exelearning() {
+  if ! python3 "$BASE/scripts/exelearning.py"; then
+    printf '%s  la sincronización de eXeLearning falló; se reintentará mañana\n' "$(date '+%F %T')"
+  fi
+}
+
+# Una vez al mes, la revisión de lo que el sincronizador no decide solo: si ha
+# aparecido documentación nueva en el repositorio de eXeLearning, o un manual más
+# reciente. No cambia nada; deja un informe y avisa. Va aquí y no en su propia
+# línea de cron para reutilizar la espera de red y la marca de día hecho.
+revisar_exelearning() {
+  local marca="$REGISTRO/.revisado-$(date +%Y-%m)"
+  [ -f "$marca" ] && return 0
+  if python3 "$BASE/scripts/revisar-exelearning.py"; then
+    touch "$marca"
+    find "$REGISTRO" -maxdepth 1 -name '.revisado-*' -mtime +90 -delete
+  fi
+}
+
 if python3 "$BASE/scripts/actualizar.py"; then
+  sincronizar_exelearning
+  revisar_exelearning
   # La marca se pone solo si la pasada terminó bien. Si falló, los disparos del
   # cuarto de hora seguirán reintentando: un corte de red pasajero se arregla
   # solo sin que nadie tenga que enterarse.

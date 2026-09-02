@@ -1,6 +1,7 @@
 {
-  "api_id": TU_API_ID,
+  "api_id": "TU_API_ID",
   "api_hash": "TU_API_HASH",
+  "repo_exelearning": "RUTA_AL_REPO_DE_EXELEARNING",
   "grupos": [
     {
       "usuario": "ChatGPTedu",
