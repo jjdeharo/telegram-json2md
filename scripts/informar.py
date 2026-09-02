@@ -6,14 +6,17 @@ trabaja a las siete de la mañana. Para lo que de verdad hay que contar —que s
 actualizó una herramienta, que se clasificó documentación nueva, que algo se
 rompió— se usa Telegram, que le llega al móvil.
 
-Lo manda **un bot**, y no la cuenta de Juanjo, por un motivo concreto: Telegram no
-notifica los mensajes que uno se escribe a sí mismo, así que un aviso en «Mensajes
-guardados» se queda ahí sin avisar de nada. Un mensaje de un bot sí suena.
+Lo manda **el bot «Claude IA»**, y no la cuenta de Juanjo, por un motivo concreto:
+Telegram no notifica los mensajes que uno se escribe a sí mismo, así que un aviso
+en «Mensajes guardados» se queda ahí sin avisar de nada. Un mensaje de un bot sí
+suena.
 
-Si el bot no está configurado, se cae a «Mensajes guardados»: el aviso queda
-registrado aunque no notifique, que es mejor que perderlo. Para configurarlo:
+Ese bot no es de este proyecto: es el canal por el que Claude le escribe desde
+cualquier sesión, y sus credenciales viven en `~/.claude/telegram-claude-ia.json`.
+Si faltaran, el aviso cae a «Mensajes guardados»: no notifica, pero no se pierde.
+Para rehacerlo:
 
-    python3 scripts/configurar-avisos.py
+    python3 ~/.claude/scripts/crear-bot-claude.py
 
 Uso:
 
@@ -35,6 +38,26 @@ BASE = Path(__file__).resolve().parent.parent
 CONFIG = BASE / "config.json"
 SESION = BASE / "sesion" / "telegram"
 BITACORA = BASE / "registro" / "avisos.log"
+BOT_GLOBAL = Path.home() / ".claude" / "telegram-claude-ia.json"
+
+
+def _bot() -> dict:
+    """Las credenciales del bot «Claude IA», que es el canal de todo lo mío.
+
+    Vive fuera de este repositorio, en ~/.claude/, porque no es de este proyecto:
+    es por donde Claude le escribe a Juanjo desde cualquier sesión. Si algún día
+    no estuviera, se mira aquí por compatibilidad y, en último extremo, el aviso
+    se manda a «Mensajes guardados», que llega aunque no notifique.
+    """
+    for ruta, clave in ((BOT_GLOBAL, None), (CONFIG, "bot_avisos")):
+        if not ruta.exists():
+            continue
+        with open(ruta, encoding="utf-8") as f:
+            datos = json.load(f)
+        bot = datos.get(clave) if clave else datos
+        if bot and bot.get("token") and bot.get("chat_id"):
+            return bot
+    return {}
 
 
 def _por_bot(texto: str, bot: dict) -> None:
@@ -76,9 +99,8 @@ def informar(texto: str) -> bool:
         f.write(f"{marca}  {texto.splitlines()[0]}\n")
 
     try:
-        with open(CONFIG, encoding="utf-8") as f:
-            bot = json.load(f).get("bot_avisos") or {}
-        if bot.get("token") and bot.get("chat_id"):
+        bot = _bot()
+        if bot:
             _por_bot(mensaje, bot)
         else:
             # Sin bot no hay notificación —Telegram no avisa de lo que uno se

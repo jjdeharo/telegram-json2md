@@ -72,8 +72,7 @@ scripts/
   decidir-exelearning.py clasifica sola esa documentación nueva y deja constancia
   actualizar-cli.py     actualiza el CLI de NotebookLM y comprueba que todo sigue
   reparar.py            diagnostica y arregla la pasada cuando falla
-  informar.py           avisa por Telegram de lo que ha pasado
-  crear-bot.py          crea el bot de avisos hablando con @BotFather
+  informar.py           avisa por Telegram, desde el bot «Claude IA»
   avisar.sh             avisos en pantalla
   diario.sh             la pasada diaria, tal como la lanza cron
   instalar.sh           instala o retira el disparo en el crontab
