@@ -1,0 +1,21 @@
+# El repositorio es PÚBLICO. Nada de lo que hay aquí abajo se sube: son
+# credenciales, o mensajes de personas reales de los grupos de Telegram.
+
+# Credenciales y sesión de Telegram
+config.json
+sesion/
+*.session
+*.session-journal
+
+# Datos de los grupos: exportaciones y conversaciones en Markdown
+datos/
+salida/
+
+# Estado del proceso automático y registros
+estado.json
+registro/
+
+# Restos
+__pycache__/
+*.pyc
+prompt.txt

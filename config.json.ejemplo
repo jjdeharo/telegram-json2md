@@ -1,0 +1,24 @@
+{
+  "api_id": TU_API_ID,
+  "api_hash": "TU_API_HASH",
+  "grupos": [
+    {
+      "usuario": "ChatGPTedu",
+      "prefijo": "chatgptedu",
+      "carpeta": "chatgpt-ia-edu",
+      "notebook": "ID_DEL_NOTEBOOK"
+    },
+    {
+      "usuario": "exelearning",
+      "prefijo": "exelearning",
+      "carpeta": "exelearning",
+      "notebook": "ID_DEL_NOTEBOOK"
+    },
+    {
+      "usuario": "vceduca",
+      "prefijo": "vceduca",
+      "carpeta": "vibe-coding-educativo",
+      "notebook": "ID_DEL_NOTEBOOK"
+    }
+  ]
+}

@@ -1,7 +1,9 @@
 import json
 import os
+import re
+import unicodedata
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List
 
 def parse_text(text_field) -> str:
     """Parse Telegram's text field which can be string or list of spans"""
@@ -108,6 +110,25 @@ def obtener_hilo_raiz(msg_id: int, mensajes_idx: Dict[int, Dict], visitados=None
     hilo_padre.append(msg)
     return hilo_padre
 
+def obtener_tipo_chat_legible(tipo_chat: str) -> str:
+    """Devuelve una representación legible del tipo de chat."""
+    nombre_tipo = {
+        'private': 'Chat privado',
+        'group': 'Grupo',
+        'supergroup': 'Supergupo',
+        'channel': 'Canal',
+        'public_supergroup': 'Supergupo público'
+    }
+    return nombre_tipo.get(tipo_chat, tipo_chat)
+
+
+def slugify(nombre_chat: str) -> str:
+    """Genera un slug seguro para nombres de chat."""
+    normalizado = unicodedata.normalize('NFKD', nombre_chat).encode('ascii', 'ignore').decode('ascii')
+    limpio = re.sub(r'[^a-zA-Z0-9]+', '-', normalizado).strip('-').lower()
+    return limpio or 'chat'
+
+
 def generar_markdown(mensajes: List[Dict], chat_info: Dict = None) -> str:
     """Genera el contenido Markdown con hilos y agrupación por día"""
     # Filtrar mensajes válidos
@@ -124,7 +145,8 @@ def generar_markdown(mensajes: List[Dict], chat_info: Dict = None) -> str:
     # Agrupar por día
     mensajes_por_dia = {}
     for msg in mensajes_validos:
-        dia = formatear_fecha(msg['date'])
+        dt_msg = datetime.fromisoformat(msg['date'].replace('Z', '+00:00'))
+        dia = dt_msg.date()
         if dia not in mensajes_por_dia:
             mensajes_por_dia[dia] = []
         mensajes_por_dia[dia].append(msg)
@@ -137,26 +159,19 @@ def generar_markdown(mensajes: List[Dict], chat_info: Dict = None) -> str:
     
     # Agregar información del chat al principio del archivo
     if chat_info:
-        # Convertir tipo de chat a una forma más legible
-        tipo_chat = chat_info.get('type', 'desconocido')
-        nombre_tipo = {
-            'private': 'Chat privado',
-            'group': 'Grupo',
-            'supergroup': 'Supergupo',
-            'channel': 'Canal',
-            'public_supergroup': 'Supergupo público'
-        }
-        tipo_legible = nombre_tipo.get(tipo_chat, tipo_chat)
-        
+        tipo_legible = obtener_tipo_chat_legible(chat_info.get('type', 'desconocido'))
         resultado.append(f"# {chat_info.get('name', 'Chat desconocido')} ({tipo_legible})\n\n")
     
     for dia in sorted(mensajes_por_dia.keys()):
-        resultado.append(f"## {dia}\n")
+        fecha_formateada = formatear_fecha(datetime.combine(dia, datetime.min.time()).isoformat())
+        resultado.append(f"## {fecha_formateada}\n")
         
         # Para cada día, construir hilos
         mensajes_dia = mensajes_por_dia[dia]
         procesados = set()
         
+        # Obtener todos los hilos para este día
+        hilos = []
         for msg in mensajes_dia:
             if msg['id'] in procesados:
                 continue
@@ -170,6 +185,13 @@ def generar_markdown(mensajes: List[Dict], chat_info: Dict = None) -> str:
                 # Mensaje raíz
                 hilo = [msg]
             
+            hilos.append(hilo)
+        
+        # Ordenar los hilos por la fecha del primer mensaje en cada hilo
+        hilos.sort(key=lambda hilo: hilo[0]['date'] if hilo else '')
+        
+        # Procesar cada hilo
+        for hilo in hilos:
             # Procesar cada mensaje en el hilo
             for hilo_msg in hilo:
                 if hilo_msg['id'] in procesados:
@@ -221,55 +243,61 @@ def main():
     mensajes = resultado['messages']
     chat_info = resultado.get('chat_info', {})
     
-    # Generar contenido Markdown
-    contenido = generar_markdown(mensajes, chat_info)
-    
-    # Dividir por meses si es grande
-    if len(contenido) > 200000:  # 200k caracteres
-        # Crear directorio para archivos divididos
-        os.makedirs('salida', exist_ok=True)
-        
-        # Dividir por meses
-        mensajes_fecha = [(datetime.fromisoformat(m['date'].replace('Z', '+00:00')), m) for m in mensajes if 'date' in m]
-        mensajes_fecha.sort(key=lambda x: x[0])
-        
-        meses = {}
-        for dt, msg in mensajes_fecha:
-            mes_anio = f"{dt.year}-{dt.month:02d}"
-            if mes_anio not in meses:
-                meses[mes_anio] = []
-            meses[mes_anio].append(msg)
-        
-        rutas_generadas = []
-        for mes_anio, msgs in meses.items():
-            contenido_mes = generar_markdown(msgs, chat_info)
-            nombre_archivo = f"conversacion-{mes_anio}.md"
-            ruta_archivo = os.path.join('salida', nombre_archivo)
-            
-            with open(ruta_archivo, 'w', encoding='utf-8') as f:
-                f.write(contenido_mes)
-            
-            rutas_generadas.append(os.path.abspath(ruta_archivo))
-        
-        # Crear README con índice
-        readme_content = "# Conversación Telegram\n\n"
-        readme_content += "Índice de conversaciones por mes:\n\n"
-        for mes_anio in sorted(meses.keys()):
-            readme_content += f"- [{mes_anio}](./salida/conversacion-{mes_anio}.md)\n"
-        
-        with open('README.md', 'w', encoding='utf-8') as f:
-            f.write(readme_content)
-        
-        rutas_generadas.append(os.path.abspath('README.md'))
-        
-        for ruta in rutas_generadas:
-            print(f"RESULT_PATH:{ruta}")
-    else:
-        # Guardar en archivo único
-        with open('conversacion.md', 'w', encoding='utf-8') as f:
-            f.write(contenido)
-        
-        print(f"RESULT_PATH:{os.path.abspath('conversacion.md')}")
+    # Agrupar siempre por mes natural y generar archivos Markdown
+    mensajes_fecha = [
+        (datetime.fromisoformat(m['date'].replace('Z', '+00:00')), m)
+        for m in mensajes
+        if m.get('date')
+    ]
+
+    if not mensajes_fecha:
+        print("No se encontraron mensajes con fecha válida")
+        return
+
+    mensajes_fecha.sort(key=lambda x: x[0])
+
+    mensajes_por_mes = {}
+    for dt, msg in mensajes_fecha:
+        mes_anio = f"{dt.year}-{dt.month:02d}"
+        if mes_anio not in mensajes_por_mes:
+            mensajes_por_mes[mes_anio] = []
+        mensajes_por_mes[mes_anio].append(msg)
+
+    nombre_chat = chat_info.get('name', 'Chat desconocido')
+    slug_chat = slugify(nombre_chat)
+
+    base_output_dir = 'salida'
+    os.makedirs(base_output_dir, exist_ok=True)
+
+    directorio_chat = os.path.join(base_output_dir, slug_chat)
+    os.makedirs(directorio_chat, exist_ok=True)
+
+    rutas_generadas = []
+    for mes_anio in sorted(mensajes_por_mes.keys()):
+        contenido_mes = generar_markdown(mensajes_por_mes[mes_anio], chat_info)
+        nombre_archivo = f"conversacion-{mes_anio}.md"
+        ruta_archivo = os.path.join(directorio_chat, nombre_archivo)
+
+        with open(ruta_archivo, 'w', encoding='utf-8') as f:
+            f.write(contenido_mes)
+
+        rutas_generadas.append(os.path.abspath(ruta_archivo))
+
+    # Crear README con índice mensual
+    readme_content = "# Conversación Telegram\n\n"
+    tipo_legible = obtener_tipo_chat_legible(chat_info.get('type', 'desconocido')) if chat_info else 'desconocido'
+    readme_content += f"Grupo: {nombre_chat} ({tipo_legible})\n\n"
+    readme_content += "Índice de conversaciones por mes:\n\n"
+    for mes_anio in sorted(mensajes_por_mes.keys()):
+        readme_content += f"- [{mes_anio}](./salida/{slug_chat}/conversacion-{mes_anio}.md)\n"
+
+    with open('README.md', 'w', encoding='utf-8') as f:
+        f.write(readme_content)
+
+    rutas_generadas.append(os.path.abspath('README.md'))
+
+    for ruta in rutas_generadas:
+        print(f"RESULT_PATH:{ruta}")
 
 if __name__ == "__main__":
     main()
