@@ -21,13 +21,33 @@ día**. Esta skill es para lo que una máquina no puede decidir sola.
 |---|---|---|
 | Sincronizar los documentos de la lista | `scripts/exelearning.py` | Cada día, solo |
 | Detectar que la lista se ha quedado corta | `scripts/revisar-exelearning.py` | Una vez al mes, solo |
-| **Decidir qué hacer con lo que aparece** | **Tú, con esta skill** | Cuando el informe lo pida |
+| Decidir qué hacer con lo que aparece | `scripts/decidir-exelearning.py` (un Claude sin sesión) | Detrás de la revisión, solo |
+| **Comprobar lo decidido y el criterio** | **Tú, con esta skill** | Cuando quieras, o si algo chirría |
 | Rehacer el manual de usuario | `scripts/manual_exelearning.py` | Cuando salga uno nuevo |
 
 Esto no es una separación caprichosa. Entre mayo y septiembre de 2026 apareció
 en el repositorio todo el subárbol `doc/elpx-format/` —37.500 palabras sobre el
 formato de archivo, incluido el catálogo de iDevices— y el cuaderno no se enteró,
 porque un script con una lista fija sincroniza lo que le dijeron y nada más.
+
+## Lo primero: ¿ha actuado alguna vez?
+
+```bash
+python3 scripts/decidir-exelearning.py --historial
+```
+
+La bitácora `docs/decisiones-automaticas.md` recoge cada documento clasificado
+automáticamente y su motivo; cada tanda deja además un commit propio, así que
+`git log --grep="Clasificar automáticamente"` cuenta la misma historia y permite
+revertir una decisión que no te convenza.
+
+**Si algo se clasificó mal, la corrección no es solo mover esa ruta de lista: es
+arreglar el enunciado.** El criterio que se le pasa a la IA está en `CRITERIO`,
+dentro de `scripts/decidir-exelearning.py`. Ya pasó una vez: una cláusula
+demasiado amplia («son instrucciones dirigidas a una IA → excluir») descartó
+`doc/elpx-format/ai-generation.md`, que son las diez reglas del formato sacadas
+del código del generador y del importador. Se acotó la cláusula a las
+instrucciones dirigidas a quien desarrolla el proyecto y volvió a entrar.
 
 ## La revisión mensual, paso a paso
 
@@ -40,7 +60,10 @@ porque un script con una lista fija sincroniza lo que le dijeron y nada más.
    Si no existe, o quieres uno fresco: `python3 scripts/revisar-exelearning.py`
    (no cambia nada, solo mira).
 
-2. **Decide la documentación «sin decidir»**, una por una, con este criterio:
+   Normalmente ya estará resuelto: la pasada mensual decide sola y sincroniza.
+   Estos pasos son para comprobarlo o para rehacerlo a mano.
+
+2. **El criterio con el que se decide**, y con el que debes juzgar tú si repasas:
 
    > ¿Ayuda a explicar **el programa** o **su formato de archivo**?
 

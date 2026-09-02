@@ -69,6 +69,7 @@ scripts/
   exelearning.py        sincroniza la documentación de eXeLearning con su cuaderno
   manual_exelearning.py consolida el manual de usuario web en un solo Markdown
   revisar-exelearning.py revisión mensual: qué documentación nueva hay que decidir
+  decidir-exelearning.py clasifica sola esa documentación nueva y deja constancia
   avisar.sh             avisos en pantalla
   diario.sh             la pasada diaria, tal como la lanza cron
   instalar.sh           instala o retira el disparo en el crontab

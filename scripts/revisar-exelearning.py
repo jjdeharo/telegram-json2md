@@ -96,6 +96,9 @@ def main() -> int:
         manual_cambiado = ("sí, la portada ha cambiado" if propio.get("portada_manual") not in (None, portada)
                            else "no")
         propio["portada_manual"] = portada
+        # Bandera para que el paso que sí actúa lo rehaga: esta revisión solo mira.
+        if manual_cambiado.startswith("sí"):
+            propio["manual_pendiente"] = True
 
     fuentes = notebook.fuentes(cuaderno)
 

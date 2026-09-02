@@ -80,9 +80,37 @@ dentro de la pasada diaria, no cambia nada y deja un informe en
 - Si la portada del manual de usuario ha cambiado.
 - El recuento de fuentes del cuaderno, para vigilar el límite de 300.
 
-Si hay algo que decidir, avisa en pantalla. El procedimiento para resolverlo está
-en la skill `cuaderno-exelearning`, enlazada desde la carpeta de skills del
-agente.
+Y a continuación se decide solo. Clasificar un documento exige leerlo —la ruta y
+el nombre no bastan: `doc/development/profiling.md` parece documentación del
+programa y resulta ser instrumentación de desarrollo; `doc/conventions.md` parece
+normas internas y resulta documentar comportamientos intencionados—, así que ese
+juicio se le pide a un Claude sin sesión interactiva
+(`scripts/decidir-exelearning.py`), se valida lo que responde y se escribe en
+`INCLUIR` o `EXCLUIR`.
+
+Lo mecánico va con ello: las entradas que apuntan a archivos borrados se retiran
+solas, y si hay manual nuevo se reconstruye.
+
+### Cómo saber si ha actuado
+
+Cada decisión deja tres rastros:
+
+1. **La bitácora** [`docs/decisiones-automaticas.md`](decisiones-automaticas.md),
+   versionada: qué documento, qué se decidió y por qué. Si está vacía o no
+   existe, es que nunca ha hecho falta actuar.
+2. **Un commit** con las decisiones y su motivo, que además la hace reversible.
+3. **Un aviso en pantalla** con el recuento.
+
+```bash
+python3 scripts/decidir-exelearning.py --historial   # ¿ha actuado alguna vez?
+python3 scripts/decidir-exelearning.py --probar      # qué decidiría, sin tocar nada
+```
+
+### Qué sigue sin decidir sola
+
+Cambiar el propósito del cuaderno, tocar las fuentes que Juanjo puso a mano (los
+PDF pedagógicos, la hoja de HackeXe) y cambiar la dirección del manual oficial si
+CEDEC publica una carpeta nueva. Eso se avisa, no se hace.
 
 ## El manual de usuario
 

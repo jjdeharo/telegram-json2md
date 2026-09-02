@@ -81,6 +81,11 @@ revisar_exelearning() {
   local marca="$REGISTRO/.revisado-$(date +%Y-%m)"
   [ -f "$marca" ] && return 0
   if python3 "$BASE/scripts/revisar-exelearning.py"; then
+    # Y acto seguido se decide: clasificar documentación nueva exige leerla, así
+    # que ese juicio se le pide a un Claude sin sesión interactiva. Lo que decida
+    # queda escrito en las listas, en la bitácora y en un commit.
+    python3 "$BASE/scripts/decidir-exelearning.py" || \
+      printf '%s  la decisión automática falló; queda para el mes que viene\n' "$(date '+%F %T')"
     touch "$marca"
     find "$REGISTRO" -maxdepth 1 -name '.revisado-*' -mtime +90 -delete
   fi
