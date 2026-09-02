@@ -61,7 +61,7 @@ falta actualizarlo a mano. La ruta está en `config.json`, en `repo_exelearning`
 Los PDF pedagógicos (`guia_rea_exe.pdf`, requisitos de calidad de las SdA) y la
 hoja de HackeXe no los gestiona el script: se quedan como estén.
 
-## La revisión mensual
+## La revisión: ¿ha aparecido documentación nueva?
 
 La sincronización mantiene al día los documentos de una lista fija. Lo que no
 puede hacer sola es darse cuenta de que **la lista se ha quedado corta**. Eso es
@@ -70,8 +70,15 @@ repositorio todo el subárbol `doc/elpx-format/` —37.500 palabras sobre el for
 de archivo, con el catálogo de iDevices dentro— y el cuaderno siguió
 sincronizando tan tranquilo la lista de mayo.
 
-Por eso hay dos capas. `scripts/revisar-exelearning.py` corre una vez al mes
-dentro de la pasada diaria, no cambia nada y deja un informe en
+Por eso hay dos comprobaciones distintas, las dos diarias, que no se cubren la
+una a la otra:
+
+- **Sincronizar** compara las huellas de una lista fija de rutas. Nunca mira
+  fuera de la lista, así que jamás vería aparecer una carpeta nueva.
+- **Revisar** recorre los 86 `.md` del repositorio y los cruza contra `INCLUIR` y
+  `EXCLUIR`. No mira contenidos: solo busca lo que no está en ninguna lista.
+
+`scripts/revisar-exelearning.py` no cambia nada y deja un informe en
 `registro/revision-exelearning-YYYY-MM.md` con:
 
 - La documentación del repositorio que no cubre ni `INCLUIR` ni `EXCLUIR`, para

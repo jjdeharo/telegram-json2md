@@ -73,22 +73,23 @@ sincronizar_exelearning() {
   fi
 }
 
-# Una vez al mes, la revisión de lo que el sincronizador no decide solo: si ha
-# aparecido documentación nueva en el repositorio de eXeLearning, o un manual más
-# reciente. No cambia nada; deja un informe y avisa. Va aquí y no en su propia
-# línea de cron para reutilizar la espera de red y la marca de día hecho.
+# Mirar si ha aparecido documentación nueva es distinto de sincronizar la que ya
+# se conoce: aquello compara las huellas de una lista fija, y esto recorre el
+# repositorio entero para ver si hay documentos que no están en ninguna lista. Ni
+# una cosa cubre a la otra, y como el recuento no cuesta nada se hace también a
+# diario: esperar al mes siguiente solo conseguiría que el cuaderno se perdiera
+# durante semanas algo que ya está publicado.
+#
+# Cuando encuentra algo, decidir qué hacer con ello exige leerlo, así que ese
+# juicio se le pide a un Claude sin sesión interactiva. Lo que decida queda en las
+# listas, en la bitácora y en un commit. Si no encuentra nada, no hace nada.
 revisar_exelearning() {
-  local marca="$REGISTRO/.revisado-$(date +%Y-%m)"
-  [ -f "$marca" ] && return 0
-  if python3 "$BASE/scripts/revisar-exelearning.py"; then
-    # Y acto seguido se decide: clasificar documentación nueva exige leerla, así
-    # que ese juicio se le pide a un Claude sin sesión interactiva. Lo que decida
-    # queda escrito en las listas, en la bitácora y en un commit.
-    python3 "$BASE/scripts/decidir-exelearning.py" || \
-      printf '%s  la decisión automática falló; queda para el mes que viene\n' "$(date '+%F %T')"
-    touch "$marca"
-    find "$REGISTRO" -maxdepth 1 -name '.revisado-*' -mtime +90 -delete
-  fi
+  python3 "$BASE/scripts/revisar-exelearning.py" >/dev/null || {
+    printf '%s  la revisión de eXeLearning falló; se reintenta mañana\n' "$(date '+%F %T')"
+    return 0
+  }
+  python3 "$BASE/scripts/decidir-exelearning.py" ||
+    printf '%s  la decisión automática falló; se reintenta mañana\n' "$(date '+%F %T')"
 }
 
 if python3 "$BASE/scripts/actualizar.py"; then

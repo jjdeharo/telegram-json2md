@@ -13,14 +13,15 @@ Repositorio del automatismo: `~/Documentos/github/automatizaciones/memoria-teleg
 Repositorio de eXeLearning: la ruta está en `config.json`, en `repo_exelearning`.
 
 Las conversaciones y la sincronización de la documentación **corren solas cada
-día**. Esta skill es para lo que una máquina no puede decidir sola.
+día**. Esta skill es para comprobar lo que se decidió solo, y para corregir el criterio
+cuando algo se clasifique mal.
 
 ## El reparto: qué es automático y qué no
 
 | | Quién | Cuándo |
 |---|---|---|
 | Sincronizar los documentos de la lista | `scripts/exelearning.py` | Cada día, solo |
-| Detectar que la lista se ha quedado corta | `scripts/revisar-exelearning.py` | Una vez al mes, solo |
+| Detectar que la lista se ha quedado corta | `scripts/revisar-exelearning.py` | Cada día, solo |
 | Decidir qué hacer con lo que aparece | `scripts/decidir-exelearning.py` (un Claude sin sesión) | Detrás de la revisión, solo |
 | **Comprobar lo decidido y el criterio** | **Tú, con esta skill** | Cuando quieras, o si algo chirría |
 | Rehacer el manual de usuario | `scripts/manual_exelearning.py` | Cuando salga uno nuevo |
@@ -49,9 +50,9 @@ demasiado amplia («son instrucciones dirigidas a una IA → excluir») descart�
 del código del generador y del importador. Se acotó la cláusula a las
 instrucciones dirigidas a quien desarrolla el proyecto y volvió a entrar.
 
-## La revisión mensual, paso a paso
+## La revisión, paso a paso
 
-1. **Mira el informe del mes**, que la pasada diaria ya habrá generado:
+1. **Mira el informe**, que la pasada diaria ya habrá generado:
 
    ```bash
    cat registro/revision-exelearning-$(date +%Y-%m).md
@@ -60,7 +61,7 @@ instrucciones dirigidas a quien desarrolla el proyecto y volvió a entrar.
    Si no existe, o quieres uno fresco: `python3 scripts/revisar-exelearning.py`
    (no cambia nada, solo mira).
 
-   Normalmente ya estará resuelto: la pasada mensual decide sola y sincroniza.
+   Normalmente ya estará resuelto: la pasada diaria decide sola y sincroniza.
    Estos pasos son para comprobarlo o para rehacerlo a mano.
 
 2. **El criterio con el que se decide**, y con el que debes juzgar tú si repasas:
