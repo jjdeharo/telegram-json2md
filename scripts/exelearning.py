@@ -42,6 +42,7 @@ AVISAR = BASE / "scripts" / "avisar.sh"
 # cómo se colabora en el repositorio (pull requests, ramas, pruebas, entorno de
 # desarrollo) se queda fuera: no puede responder a nadie y compite con lo útil
 # a la hora de recuperar fragmentos.
+# Decisiones automáticas del 03/09/2026:
 INCLUIR = [
     "README.md",
     "KNOWN_ISSUES.md",
@@ -75,6 +76,8 @@ INCLUIR = [
 # ausente de INCLUIR, para que la revisión periódica pueda distinguir entre «esto
 # se descartó en su día» y «esto es nuevo y hay que decidir qué hacer con ello».
 EXCLUIR = [
+    "doc/development/c10k-benchmark.md",  # Versión en inglés del mismo informe interno de benchmark, orientado a quien desarrolla y prueba el servidor, no a diagnosticar problemas de uso.
+    "doc/development/c10k-benchmark.es.md",  # Informe interno de investigación de rendimiento con metodología de laboratorio y herramientas de carga, no describe comportamientos que sufra un usuario.
     "AGENTS.md",                     # instrucciones para una IA que toca el código
     "CLAUDE.md",                     # ídem
     "SECURITY.md",                   # política de seguridad del proyecto
