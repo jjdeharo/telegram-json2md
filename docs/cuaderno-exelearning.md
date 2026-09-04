@@ -126,8 +126,20 @@ falta actualizarlo a mano. La ruta está en `config.json`, en `repo_exelearning`
 - **Está y no ha cambiado** → no lo toca.
 - **Está, lo gestiona este script y ya no está en el repositorio** → lo retira.
 
-Los PDF pedagógicos (`guia_rea_exe.pdf`, requisitos de calidad de las SdA) y la
-hoja de HackeXe no los gestiona el script: se quedan como estén.
+El material subido a mano —los requisitos de calidad de las SdA y la hoja de
+HackeXe— no lo gestiona el script: se queda como esté. Eso no significa que nadie
+lo mire. La revisión periódica comprueba, para cada uno, que siga en el cuaderno y
+que su original no se haya reeditado, y lo dice en su informe: la tabla está en
+`MATERIAL_EXTERNO`, dentro de `scripts/revisar-exelearning.py`.
+
+De los recursos hechos con eXeLearning se vigila el `content.xml`, que cambia
+cuando se reedita el material y no cuando el sitio se retoca por fuera. De una
+entrada de blog o de un wiki solo se comprueba que siga en pie, porque su HTML
+cambia solo y compararlo daría un aviso por semana.
+
+Esta comprobación existe porque faltaba: `guia_rea_exe.pdf` era la guía de 2019,
+escrita para eXeLearning 2.9, y estuvo siete años en el cuaderno sin que nada lo
+señalara. Se descubrió preguntándole a Karla de qué año era su propia fuente.
 
 ## Los documentos escritos a mano
 

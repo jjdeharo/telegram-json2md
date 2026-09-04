@@ -70,6 +70,97 @@ def expandir(repo: Path, patrones) -> set[str]:
     return cubiertos
 
 
+# Material que no sale de ningún repositorio: publicaciones de CEDEC y hojas de
+# ayuda que alguien subió a mano en su día. Nada las vigilaba, y así la guía de
+# REA de 2019 se pasó siete años en el cuaderno explicando eXeLearning 2.9 —dos
+# generaciones por detrás del programa que usa quien pregunta—, hasta que se le
+# preguntó a Karla por ella.
+#
+# De cada una se guarda de cuándo es y qué mirar para saber si ha cambiado:
+#
+# - `vigilar` es la dirección cuya huella se compara con la de la revisión
+#   anterior. Para los recursos hechos con eXeLearning se apunta a su
+#   `content.xml`, que cambia cuando se reedita el material y no cuando el sitio
+#   se retoca por fuera.
+# - `solo_vive` marca lo que únicamente se comprueba que siga en pie: una entrada
+#   de blog cambia sola —comentarios, plantilla— y compararla daría un aviso cada
+#   semana; el wiki de HackeXe lo edita Juanjo, que ya sabe cuándo lo toca.
+# - `pagina` es dónde mirar si hay una edición nueva, para el informe.
+MATERIAL_EXTERNO = {
+    "guia-rea-exelearning-2026.md": {
+        "que_es": "Guía de creación de REA con eXeLearning (2026), de CEDEC",
+        "desde": "junio de 2026",
+        "vigilar": "https://descargas.intef.es/cedec/proyectoedia/guias/contenidos/"
+                   "guia-de-creacion-de-rea-con-exelearning-2026_web/content.xml",
+        "pagina": "https://cedec.intef.es/guia-de-creacion-de-rea-con-exelearning-2026-"
+                  "un-recorrido-paso-a-paso/",
+        "rehacer": "docs/cuaderno-exelearning.md explica cómo se rehizo desde el .elpx",
+    },
+    "Requisitos de calidad de Situaciones de Aprendizaje (REA).pdf": {
+        "que_es": "Requisitos de calidad de SdA-REA, de CEDEC",
+        "desde": "junio de 2025",
+        "vigilar": "https://descargas.intef.es/cedec/protocoloexe/calidad_rea/content.xml",
+        "pagina": "https://cedec.intef.es/requisitos-de-calidad-de-rea-como-"
+                  "situaciones-de-aprendizaje/",
+    },
+    "recomendaciones-accesibilidad-cedec.md": {
+        "que_es": "12 recomendaciones para elaborar materiales accesibles e inclusivos",
+        "desde": "junio de 2020",
+        "vigilar": "https://cedec.intef.es/12-recomendaciones-para-elaborar-"
+                   "materiales-accesibles-e-inclusivos/",
+        "solo_vive": True,
+    },
+    "HackeXe4 - Hoja 1": {
+        "que_es": "Hoja de HackeXe 4, de Juanjo",
+        "desde": "sin edición datada",
+        "vigilar": "https://hackexe.tiddlyhost.com/",
+        "solo_vive": True,
+    },
+}
+
+
+def revisar_material_externo(propio: dict, presentes: set[str]) -> tuple[list[str], bool]:
+    """Comprueba que el material de fuera sigue en pie, y si su original cambió.
+
+    Devuelve las líneas del informe y si hay algo que decidir. No cambia nada:
+    resubir una publicación ajena exige leerla antes.
+    """
+    huellas = propio.setdefault("material_externo", {})
+    filas, pendiente = [], False
+
+    for titulo, ficha in MATERIAL_EXTERNO.items():
+        avisos = []
+        if titulo not in presentes:
+            avisos.append("**ya no está en el cuaderno**")
+            pendiente = True
+        try:
+            with urllib.request.urlopen(ficha["vigilar"], timeout=60) as r:
+                huella = hashlib.sha256(r.read()).hexdigest()
+        except Exception as error:  # noqa: BLE001
+            avisos.append(f"no se pudo comprobar el original ({error})")
+            pendiente = True
+        else:
+            if not ficha.get("solo_vive"):
+                if huellas.get(titulo) not in (None, huella):
+                    avisos.append("**el original ha cambiado**: hay que rehacerlo")
+                    pendiente = True
+                huellas[titulo] = huella
+        filas.append((titulo, ficha, avisos))
+
+    lineas = ["## Material subido a mano", "",
+              "Publicaciones que no salen de ningún repositorio: si su original se",
+              "reedita, aquí no se entera nadie salvo que se mire.", ""]
+    for titulo, ficha, avisos in filas:
+        estado = "; ".join(avisos) if avisos else "sin cambios"
+        lineas.append(f"- `{titulo}` — {ficha['que_es']} ({ficha['desde']}): {estado}")
+        if avisos and ficha.get("pagina"):
+            lineas.append(f"  - comprueba si hay edición nueva en {ficha['pagina']}")
+        if avisos and ficha.get("rehacer"):
+            lineas.append(f"  - {ficha['rehacer']}")
+    lineas.append("")
+    return lineas, pendiente
+
+
 def main() -> int:
     with open(BASE / "config.json", encoding="utf-8") as f:
         config = json.load(f)
@@ -82,7 +173,7 @@ def main() -> int:
 
     # Toda la documentación del repositorio, y con qué se corresponde
     todos = documentacion_del_repo(repo)
-    consolidados = expandir(repo, [patron for patron, _ in exelearning.CONSOLIDAR.values()])
+    consolidados = expandir(repo, [patron for patron, *_ in exelearning.CONSOLIDAR.values()])
     incluidos = sorted(expandir(repo, exelearning.INCLUIR) | consolidados)
     excluidos = sorted(expandir(repo, exelearning.EXCLUIR) - set(incluidos))
     sin_decidir = [r for r in todos if r not in incluidos and r not in excluidos]
@@ -163,6 +254,10 @@ def main() -> int:
             "",
         ]
 
+    material, material_pendiente = revisar_material_externo(
+        propio, {f["title"] for f in fuentes})
+    lineas += material
+
     lineas += [
         "## Fuera a propósito",
         "",
@@ -179,7 +274,8 @@ def main() -> int:
     print("\n".join(lineas))
     print(f"\n→ informe en {INFORME.relative_to(BASE)}")
 
-    pendiente = bool(sin_decidir or huerfanos or manual_cambiado.startswith("sí"))
+    pendiente = bool(sin_decidir or huerfanos or material_pendiente
+                     or manual_cambiado.startswith("sí"))
     if pendiente:
         subprocess.run([str(BASE / "scripts" / "avisar.sh"), "paso",
                         f"Revisión de eXeLearning: hay cosas que decidir. "
