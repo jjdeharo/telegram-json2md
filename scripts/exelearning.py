@@ -16,6 +16,7 @@ El repositorio de eXeLearning se actualiza con `git pull` antes de nada.
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import hashlib
 import json
 import subprocess
@@ -130,6 +131,14 @@ CONSOLIDAR = {
     ),
 }
 
+# El cuaderno describe el programa **publicado**: la documentación técnica se
+# toma del último tag, no de `main`, para que no explique funciones que quien
+# pregunta todavía no tiene. Lo que está por llegar vive concentrado en dos
+# sitios, y estos sí se toman de la rama de desarrollo: el CHANGELOG, cuya
+# sección `Unreleased` es justamente eso, y los ADR, que son decisiones sobre lo
+# que vendrá y avisan de ello en su cabecera.
+DESDE_DESARROLLO = {"public/CHANGELOG.md"}
+
 # Fuentes de la etapa manual que hay que retirar. Todo se sube ahora en Markdown,
 # así que cualquier .docx del proyecto es una versión superada: se reconocen por
 # la forma del título en vez de enumerarlos, para que no haga falta tocar esta
@@ -173,10 +182,40 @@ def titulo_de(ruta_relativa: str, prefijo: str = "exelearning") -> str:
     return f"{prefijo}-" + ruta_relativa[:-3].replace("/", "-") + ".md"
 
 
-def recoger(repo: Path, patrones: list[str], prefijo: str) -> dict[str, str]:
-    """{título: contenido} de los patrones que se resuelven dentro de un repositorio."""
+def archivos_del_tag(repo: Path, version: str) -> list[str]:
+    """Todo lo que hay en la versión publicada, para resolver los patrones ahí.
+
+    Los patrones no se pueden resolver contra el disco: en el disco está `main`,
+    y un archivo que solo exista allí acabaría subido como si estuviera publicado.
+    """
+    return subprocess.run(["git", "-C", str(repo), "ls-tree", "-r", "--name-only", version],
+                          capture_output=True, text=True).stdout.split("\n")
+
+
+def recoger(repo: Path, patrones: list[str], prefijo: str,
+            version: str | None = None) -> dict[str, str]:
+    """{título: contenido} de los patrones que se resuelven dentro de un repositorio.
+
+    Con `version`, el contenido se toma de esa etiqueta —la última publicada— y no
+    del árbol de trabajo, salvo para lo que está en DESDE_DESARROLLO.
+    """
     documentos = {}
+    inventario = archivos_del_tag(repo, version) if version else []
     for patron in patrones:
+        if version and patron not in DESDE_DESARROLLO:
+            if "*" in patron:
+                suelto = patron.replace("**/", "")
+                rutas = sorted(r for r in inventario if fnmatch.fnmatch(r, suelto))
+            else:
+                rutas = [patron] if patron in inventario else []
+            if not rutas:
+                registrar(f"  {prefijo}:{patron}: todavía no está en la {version}")
+                continue
+            for relativa in rutas:
+                documentos[titulo_de(relativa, prefijo)] = subprocess.run(
+                    ["git", "-C", str(repo), "show", f"{version}:{relativa}"],
+                    capture_output=True, text=True).stdout
+            continue
         rutas = sorted(repo.glob(patron)) if "*" in patron else [repo / patron]
         for ruta in rutas:
             if not ruta.is_file():
@@ -204,6 +243,22 @@ def estado_desarrollo(repo: Path) -> tuple[str, int]:
     return version, int(adelanto) if adelanto.isdigit() else 0
 
 
+def aviso_publicado(version: str, adelanto: int) -> list[str]:
+    """Lo que hay que saber del cuaderno en conjunto: describe lo publicado."""
+    cuanto = (f" El desarrollo va {adelanto} commit(s) por delante, y eso no"
+              if adelanto else " Lo que se esté desarrollando no")
+    return [
+        f"> **La documentación técnica de aquí es la de la {version}**, la última",
+        "> versión publicada y la que tiene instalada quien pregunta: se toma de",
+        f"> esa etiqueta y no de la rama de desarrollo.{cuanto}",
+        "> está en estas fuentes, con dos excepciones a propósito:",
+        "> `exelearning-public-CHANGELOG`, cuya sección `Unreleased` es lo que",
+        "> falta por publicar, y `exelearning-doc-architecture-decisiones`, que",
+        "> recoge decisiones aún por hacer. Fuera de esas dos, si algo no está",
+        "> documentado aquí, es que todavía no ha salido.",
+    ]
+
+
 def aviso_desarrollo(version: str, adelanto: int) -> list[str]:
     """El párrafo que separa lo que ya está publicado de lo que aún no."""
     cuanto = (f"hoy {adelanto} commit(s) por delante de la **{version}**"
@@ -221,12 +276,13 @@ def aviso_desarrollo(version: str, adelanto: int) -> list[str]:
 
 def reunir_documentos(repo: Path, extras: dict[str, Path]) -> dict[str, str]:
     """Devuelve {título: contenido} de todo lo que debe estar en el cuaderno."""
-    documentos = recoger(repo, INCLUIR, "exelearning")
+    version, adelanto = estado_desarrollo(repo)
+    documentos = recoger(repo, INCLUIR, "exelearning",
+                         version if version != "desconocida" else None)
 
     for prefijo, ruta_repo in extras.items():
         documentos.update(recoger(ruta_repo, COMPLEMENTARIOS[prefijo], prefijo))
 
-    version, adelanto = estado_desarrollo(repo)
     for titulo, (patron, encabezado, nota) in CONSOLIDAR.items():
         partes = [f"# {encabezado}\n",
                   "\n".join(aviso_desarrollo(version, adelanto) + [f"> {nota}"]) + "\n"]
@@ -247,11 +303,11 @@ def escribir_indice(documentos: dict[str, str], repo: Path) -> tuple[str, str]:
     lineas = [
         "# Índice del cuaderno de eXeLearning",
         "",
-        "Documentación técnica de eXeLearning, sincronizada desde la rama de",
-        "desarrollo del repositorio oficial, y la de las herramientas que lo",
-        "rodean. El manual de usuario va aparte, en `manual-exelearning-4.0.1.md`.",
+        "Documentación técnica de eXeLearning, sincronizada desde el repositorio",
+        "oficial, y la de las herramientas que lo rodean. El manual de usuario va",
+        "aparte, en `manual-exelearning-4.0.1.md`.",
         "",
-        *aviso_desarrollo(version, adelanto),
+        *aviso_publicado(version, adelanto),
         "",
         "Las fuentes llevan el nombre del proyecto por delante: `exelearning-` es el",
         "programa; `mod_exescorm-`, `mod_exeweb-` y `wp-exelearning-` son los plugins",
@@ -290,11 +346,9 @@ def escribir_indice(documentos: dict[str, str], repo: Path) -> tuple[str, str]:
         "- **Comportamientos raros pero intencionados**: `KNOWN_ISSUES`,",
         "  `doc-conventions`, `doc-architecture-decisiones`.",
         "- **Al pasar de la 3.x a la 4.x**: `UPGRADE`.",
-        "- **Antes de decir que algo existe**: comprobarlo en",
-        "  `exelearning-public-CHANGELOG`. La documentación técnica va por delante",
-        "  de lo publicado, y `doc-architecture-decisiones` recoge decisiones que",
-        "  todavía son propuestas. Si una función solo aparece ahí o en la sección",
-        "  `Unreleased`, hay que decir que está por llegar, no explicar cómo usarla.",
+        "- **Si algo solo aparece en `doc-architecture-decisiones` o en la sección",
+        "  `Unreleased` del CHANGELOG**, está por llegar: hay que decirlo así, no",
+        "  explicar cómo usarlo. El resto de fuentes describen lo ya publicado.",
         "",
         "Las rutas que aparecen en la documentación técnica son del árbol de código",
         "del proyecto. No sirven para quien ha instalado el programa: a esa persona",

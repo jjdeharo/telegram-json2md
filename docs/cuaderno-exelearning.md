@@ -44,6 +44,38 @@ commits del proyecto.
 
 La lista concreta está en `INCLUIR`, dentro de `scripts/exelearning.py`.
 
+## De qué versión es lo que hay aquí
+
+El cuaderno describe el programa **publicado**, no el que se está escribiendo.
+La documentación técnica del repositorio se toma del último tag —hoy la v4.0.3—
+y no de `main`, que va decenas de commits por delante. El motivo es el público:
+quien pregunta tiene instalada la versión publicada, y una respuesta que explique
+cómo usar algo que aún no ha salido le manda a buscar un menú que no existe.
+
+Se descartó subir las dos versiones de cada documento, la publicada y la de
+desarrollo. Duplicar no sale caro por el número de fuentes —hoy serían cinco
+más—, sino por la recuperación: dos textos casi idénticos sobre el mismo tema
+compiten entre sí, y lo probable no es que el cuaderno elija bien, sino que
+mezcle párrafos de ambos. Cuanto más se parecen, peor.
+
+Lo que está por llegar vive concentrado en dos fuentes, y solo en esas dos:
+
+- **`exelearning-public-CHANGELOG`**, que sí se toma de `main` porque su sección
+  `Unreleased` es justamente la frontera entre lo publicado y lo que viene.
+- **`exelearning-doc-architecture-decisiones`**, los ADR, que por naturaleza son
+  decisiones sobre el futuro. Abre con un aviso que dice desde dónde se
+  sincroniza, cuántos commits se le lleva a la versión publicada y qué significan
+  `Proposed` y `Accepted` —ninguno de los dos es «publicado»—.
+
+El índice lleva el aviso equivalente para el conjunto. Ambos se generan en cada
+pasada con `git describe`, así que la versión y la distancia no se quedan viejas,
+y el día que salga una versión nueva los documentos que se hubieran adelantado
+entran solos.
+
+Un documento que todavía no exista en el tag no se sube, y si ya estaba subido se
+retira: es el caso de `doc/development/scorm12-runtime-contract.md`, el contrato
+del runtime SCORM reescrito, que volverá cuando se publique.
+
 ## El ecosistema, y por qué está aquí
 
 Lo que más se pregunta en el grupo no es cómo se usa eXeLearning —el manual lo
