@@ -147,6 +147,12 @@ LEGADO_EXPLICITO = {
     "styles.docx",
     "tinymce-editor-compatibility.docx",
     "manual_exe3.pdf",          # manual de la 3.0, sustituido por el de la 4.0.1
+    # La guía de REA de 2019 (NIPO 847-19-122-0) estaba escrita para la 2.9 de
+    # escritorio: describía un programa de hace dos generaciones. La sustituye
+    # `guia-rea-exelearning-2026.md`, consolidada de la edición de 2026. Lo único
+    # que se pierde con ella son las «12 recomendaciones» de accesibilidad, que
+    # la nueva no trae y que por eso se conservan aparte, en `fuentes/`.
+    "guia_rea_exe.pdf",
 }
 
 
@@ -410,10 +416,11 @@ def sincronizar(config: dict, estado: dict, subir: bool) -> int:
     titulo_indice, contenido_indice = escribir_indice(documentos, repo)
     documentos[titulo_indice] = contenido_indice
 
-    # El manual consolidado no viene del repositorio: se conserva el que haya.
+    # El manual de usuario y la guía de REA no vienen del repositorio: son
+    # publicaciones de CEDEC consolidadas aparte, y se conserva la que haya.
     MATERIAL.mkdir(parents=True, exist_ok=True)
-    for manual in MATERIAL.glob("manual-*.md"):
-        documentos[manual.name] = manual.read_text(encoding="utf-8")
+    for consolidado in sorted([*MATERIAL.glob("manual-*.md"), *MATERIAL.glob("guia-*.md")]):
+        documentos[consolidado.name] = consolidado.read_text(encoding="utf-8")
 
     # Y los documentos escritos a mano, que sí están versionados.
     for propia in sorted(FUENTES.glob("*.md")):
