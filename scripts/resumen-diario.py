@@ -23,6 +23,26 @@ sys.path.insert(0, str(BASE / "scripts"))
 
 from informar import informar  # noqa: E402
 
+# Los grupos se registran por su nombre de usuario de Telegram, que no siempre
+# se parece al nombre con el que Juanjo los conoce. El aviso lleva el segundo.
+NOMBRES = {
+    "chatgptedu": "ChatGPT-IA-edu",
+    "exelearning": "eXeLearning",
+    "vceduca": "Vibe Coding Educativo",
+}
+
+
+def bonito(clave: str) -> str:
+    return NOMBRES.get(clave.lower(), clave)
+
+
+def listar(titulos: list[str], tope: int = 6) -> list[str]:
+    """Enumera los archivos tocados, recortando la lista si se hace larga."""
+    lineas = [f"   – {t}" for t in titulos[:tope]]
+    if len(titulos) > tope:
+        lineas.append(f"   – …y {len(titulos) - tope} más")
+    return lineas
+
 
 def resumir(registro: str) -> tuple[str, bool]:
     """Devuelve el texto del resumen y si hubo algún problema.
@@ -37,31 +57,66 @@ def resumir(registro: str) -> tuple[str, bool]:
     lineas = []
     problema = False
 
-    # --- Conversaciones
+    # --- Conversaciones de los grupos de Telegram
     hasta = re.search(r"=== actualización hasta (\S+) ===", registro)
     subidas = re.search(r"=== terminado: (\d+) subida", registro)
-    al_dia = len(re.findall(r": al día, nada que hacer", registro))
+    fecha = f" hasta el {hasta.group(1)[8:10]}/{hasta.group(1)[5:7]}" if hasta else ""
+
+    # Cada grupo deja rastro de cuántos mensajes exportó, o de que no había nada.
+    mensajes: dict[str, int] = {}
+    al_dia: list[str] = []
+    grupo = None
+    for linea in registro.splitlines():
+        if exp := re.search(r"(\S+): exportando ", linea):
+            grupo = bonito(exp.group(1))
+        elif sin := re.search(r"(\S+): al día, nada que hacer", linea):
+            al_dia.append(bonito(sin.group(1)))
+        elif con := re.search(r"(\d+) mensajes con texto", linea):
+            if grupo:
+                mensajes[grupo] = mensajes.get(grupo, 0) + int(con.group(1))
+
     if subidas:
         cuantas = int(subidas.group(1))
-        detalle = (f"{cuantas} conversación(es) actualizada(s)" if cuantas
-                   else f"sin novedades ({al_dia} grupos al día)")
-        lineas.append(f"• *Telegram*: {detalle}"
-                      + (f", hasta el {hasta.group(1)[8:10]}/{hasta.group(1)[5:7]}" if hasta else ""))
+        if cuantas:
+            lineas.append(f"• *Telegram*: {cuantas} conversación(es) subida(s) a "
+                          f"NotebookLM{fecha}")
+            lineas += [f"   – {g}: {n} mensajes" for g, n in mensajes.items()]
+        else:
+            lineas.append(f"• *Telegram*: sin mensajes nuevos{fecha}")
+            if al_dia:
+                lineas.append(f"   – ya al día: {', '.join(al_dia)}")
     else:
-        lineas.append("• *Telegram*: no llegó a terminar")
+        lineas.append("• *Telegram*: la exportación no llegó a terminar")
         problema = True
 
-    # --- Documentación de eXeLearning
-    sincro = re.search(r"resumen: (\d+) nueva\(s\), (\d+) actualizada\(s\), (\d+) retirada", registro)
+    # --- Documentación de eXeLearning que va al cuaderno de Karla
+    sincro = re.search(r"resumen: (\d+) nueva\(s\), (\d+) actualizada\(s\), (\d+) retirada",
+                       registro)
+    total = re.search(r"(\d+) documentos deben estar en el cuaderno", registro)
+    cuantos = f" (de {total.group(1)} en total)" if total else ""
     if sincro:
         nuevas, cambiadas, retiradas = (int(x) for x in sincro.groups())
+        # Se conserva qué le pasó a cada archivo: alta, cambio o baja.
+        verbos = {"añadiendo": "nuevo", "actualizando": "actualizado",
+                  "retirando": "retirado"}
+        tocados = [f"{titulo} ({verbos[verbo]})" for verbo, titulo in
+                   re.findall(r"^\s+[+~-] (añadiendo|actualizando|retirando) (.+)$",
+                              registro, re.M)]
         if nuevas or cambiadas or retiradas:
-            lineas.append(f"• *eXeLearning*: {nuevas} nueva(s), {cambiadas} actualizada(s), "
-                          f"{retiradas} retirada(s)")
+            partes = []
+            if nuevas:
+                partes.append(f"{nuevas} nuevo(s)")
+            if cambiadas:
+                partes.append(f"{cambiadas} actualizado(s)")
+            if retiradas:
+                partes.append(f"{retiradas} retirado(s)")
+            lineas.append(f"• *Documentación de eXeLearning* en el cuaderno de Karla: "
+                          f"{', '.join(partes)}{cuantos}")
+            lineas += listar(tocados)
         else:
-            lineas.append("• *eXeLearning*: documentación sin cambios")
+            lineas.append(f"• *Documentación de eXeLearning*: sin cambios{cuantos}")
     else:
-        lineas.append("• *eXeLearning*: no se pudo sincronizar")
+        lineas.append("• *Documentación de eXeLearning*: no se pudo sincronizar")
         problema = True
 
     # --- Documentación nueva que hubo que clasificar
@@ -72,9 +127,10 @@ def resumir(registro: str) -> tuple[str, bool]:
 
     # --- El CLI del que depende todo
     if version := re.search(r"CLI de NotebookLM al día \(([\d.]+)\)", registro):
-        lineas.append(f"• *CLI*: al día ({version.group(1)})")
+        lineas.append(f"• *CLI de NotebookLM*: al día (versión {version.group(1)})")
     elif actualizado := re.search(r"actualizado a ([\d.]+) y comprobado", registro):
-        lineas.append(f"• *CLI*: actualizado a la {actualizado.group(1)} y comprobado")
+        lineas.append(f"• *CLI de NotebookLM*: actualizado a la versión "
+                      f"{actualizado.group(1)} y comprobado")
 
     # --- Lo que haya ido mal
     for aviso in re.findall(r"^\S+ \S+  (la .*falló.*|fallo: .*)$", registro, re.M):
