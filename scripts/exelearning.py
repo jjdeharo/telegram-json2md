@@ -328,7 +328,13 @@ def escribir_indice(documentos: dict[str, str], repo: Path) -> tuple[str, str]:
         "  plugins oficiales. Cuando alguien dice que su aula virtual rechaza un",
         "  exportado de la 4.x, casi siempre es que la plataforma lleva la versión",
         "  antigua del módulo y solo la administración puede actualizarla.",
-        "  El contrato del runtime está en `doc-development-scorm12-runtime-contract`.",
+        # El contrato del runtime solo se cita si está: es documentación que se
+        # adelantó a la versión publicada, y una remisión a una fuente ausente
+        # manda a buscar lo que no hay.
+        *(["  El contrato del runtime está en "
+           "`doc-development-scorm12-runtime-contract`."]
+          if "exelearning-doc-development-scorm12-runtime-contract.md" in documentos
+          else []),
         "- **Publicar en WordPress**: `wp-exelearning-*`.",
         "- **Qué hace cada plataforma con un contenido de eXeLearning** (Moodle,",
         "  Procomún, EducaMadrid, Junta de Andalucía, GitHub Pages):",
