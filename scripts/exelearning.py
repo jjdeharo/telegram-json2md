@@ -121,8 +121,13 @@ COMPLEMENTARIOS = {
 # pero son veinte archivos cortos: como fuentes sueltas se pisan entre ellas, así
 # que van en un único documento.
 CONSOLIDAR = {
-    "exelearning-doc-architecture-decisiones.md": ("doc/architecture/adr/*.md",
-                                                   "Decisiones de arquitectura (ADR)"),
+    "exelearning-doc-architecture-decisiones.md": (
+        "doc/architecture/adr/*.md",
+        "Decisiones de arquitectura (ADR)",
+        "Cada decisión lleva su propio campo `status`: `Proposed` es una propuesta "
+        "—puede que ni siquiera se llegue a hacer—, `Accepted` está aprobada. "
+        "Ninguno de los dos significa que esté publicada.",
+    ),
 }
 
 # Fuentes de la etapa manual que hay que retirar. Todo se sube ahora en Markdown,
@@ -182,6 +187,38 @@ def recoger(repo: Path, patrones: list[str], prefijo: str) -> dict[str, str]:
     return documentos
 
 
+def estado_desarrollo(repo: Path) -> tuple[str, int]:
+    """Última versión publicada, y cuántos commits lleva la rama por delante.
+
+    La documentación se sincroniza desde `main`, así que describe un programa que
+    todavía no está en manos de nadie. Quien lea estas fuentes necesita saberlo,
+    y necesita saber cuánto: no es lo mismo ir dos commits por delante que
+    cincuenta.
+    """
+    def git(*orden: str) -> str:
+        return subprocess.run(["git", "-C", str(repo), *orden],
+                              capture_output=True, text=True).stdout.strip()
+
+    version = git("describe", "--tags", "--abbrev=0") or "desconocida"
+    adelanto = git("rev-list", f"{version}..HEAD", "--count") if version != "desconocida" else ""
+    return version, int(adelanto) if adelanto.isdigit() else 0
+
+
+def aviso_desarrollo(version: str, adelanto: int) -> list[str]:
+    """El párrafo que separa lo que ya está publicado de lo que aún no."""
+    cuanto = (f"hoy {adelanto} commit(s) por delante de la **{version}**"
+              if adelanto else f"hoy a la altura de la **{version}**")
+    return [
+        "> **Ojo: esto no describe el programa publicado.** Estas fuentes se",
+        f"> sincronizan desde la rama de desarrollo, {cuanto},",
+        "> que es la última versión publicada y la que tiene instalada quien",
+        "> pregunta. Lo que aquí se cuenta puede no haber salido todavía. Para",
+        "> saber qué está ya disponible, la referencia es",
+        "> `exelearning-public-CHANGELOG`: su sección `Unreleased` es justamente",
+        "> lo que falta por publicar.",
+    ]
+
+
 def reunir_documentos(repo: Path, extras: dict[str, Path]) -> dict[str, str]:
     """Devuelve {título: contenido} de todo lo que debe estar en el cuaderno."""
     documentos = recoger(repo, INCLUIR, "exelearning")
@@ -189,8 +226,10 @@ def reunir_documentos(repo: Path, extras: dict[str, Path]) -> dict[str, str]:
     for prefijo, ruta_repo in extras.items():
         documentos.update(recoger(ruta_repo, COMPLEMENTARIOS[prefijo], prefijo))
 
-    for titulo, (patron, encabezado) in CONSOLIDAR.items():
-        partes = [f"# {encabezado}\n"]
+    version, adelanto = estado_desarrollo(repo)
+    for titulo, (patron, encabezado, nota) in CONSOLIDAR.items():
+        partes = [f"# {encabezado}\n",
+                  "\n".join(aviso_desarrollo(version, adelanto) + [f"> {nota}"]) + "\n"]
         for ruta in sorted(repo.glob(patron)):
             if ruta.name in ("README.md", "template.md") or "template" in ruta.name:
                 continue
@@ -204,14 +243,15 @@ def reunir_documentos(repo: Path, extras: dict[str, Path]) -> dict[str, str]:
 
 def escribir_indice(documentos: dict[str, str], repo: Path) -> tuple[str, str]:
     """Un índice para que el cuaderno sepa qué tiene y a qué responde cada cosa."""
-    version = subprocess.run(["git", "-C", str(repo), "describe", "--tags", "--abbrev=0"],
-                             capture_output=True, text=True).stdout.strip() or "desconocida"
+    version, adelanto = estado_desarrollo(repo)
     lineas = [
         "# Índice del cuaderno de eXeLearning",
         "",
-        f"Documentación técnica de eXeLearning **{version}**, sincronizada desde el",
-        "repositorio oficial, y la de las herramientas que lo rodean. El manual de",
-        "usuario va aparte, en `manual-exelearning-4.0.1.md`.",
+        "Documentación técnica de eXeLearning, sincronizada desde la rama de",
+        "desarrollo del repositorio oficial, y la de las herramientas que lo",
+        "rodean. El manual de usuario va aparte, en `manual-exelearning-4.0.1.md`.",
+        "",
+        *aviso_desarrollo(version, adelanto),
         "",
         "Las fuentes llevan el nombre del proyecto por delante: `exelearning-` es el",
         "programa; `mod_exescorm-`, `mod_exeweb-` y `wp-exelearning-` son los plugins",
@@ -250,6 +290,11 @@ def escribir_indice(documentos: dict[str, str], repo: Path) -> tuple[str, str]:
         "- **Comportamientos raros pero intencionados**: `KNOWN_ISSUES`,",
         "  `doc-conventions`, `doc-architecture-decisiones`.",
         "- **Al pasar de la 3.x a la 4.x**: `UPGRADE`.",
+        "- **Antes de decir que algo existe**: comprobarlo en",
+        "  `exelearning-public-CHANGELOG`. La documentación técnica va por delante",
+        "  de lo publicado, y `doc-architecture-decisiones` recoge decisiones que",
+        "  todavía son propuestas. Si una función solo aparece ahí o en la sección",
+        "  `Unreleased`, hay que decir que está por llegar, no explicar cómo usarla.",
         "",
         "Las rutas que aparecen en la documentación técnica son del árbol de código",
         "del proyecto. No sirven para quien ha instalado el programa: a esa persona",
