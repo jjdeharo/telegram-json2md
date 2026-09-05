@@ -241,7 +241,7 @@ def main() -> int:
 
     todos = revision.documentacion_del_repo(repo)
     incluidos = revision.expandir(repo, exelearning.INCLUIR) | revision.expandir(
-        repo, [patron for patron, _ in exelearning.CONSOLIDAR.values()])
+        repo, [patron for patron, *_ in exelearning.CONSOLIDAR.values()])
     excluidos = revision.expandir(repo, exelearning.EXCLUIR)
     pendientes = [r for r in todos if r not in incluidos and r not in excluidos]
 
