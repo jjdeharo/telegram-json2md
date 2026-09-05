@@ -131,6 +131,30 @@ CONSOLIDAR = {
     ),
 }
 
+# Documentos que no son Markdown y se suben envueltos en él.
+#
+# `.env.dist` es el único sitio donde el proyecto documenta cada variable de
+# configuración del servidor, y —esto es lo que lo hace imprescindible aquí— es
+# donde avisa de los cambios que rompen instalaciones ya en marcha, marcados como
+# `SECURITY / UPGRADE NOTE`. El CHANGELOG no los detalla: de todo el endurecimiento
+# de la v4.0.2 dice solo «SSRF protection», y quien actualiza se encuentra la
+# integración con Moodle rechazando todo con «Invalid token or unauthorized
+# provider» sin nada que se lo explique. Pasó en el NAS de Juanjo el 05/09/2026.
+#
+# El cuaderno tenía la ADR del asunto, que explica cómo se comparan las entradas
+# de PROVIDER_URLS, pero no que vacía dejara de significar «todo permitido».
+ENVUELTOS = {
+    "exelearning-configuracion-env.md": (
+        ".env.dist",
+        "Configuración del servidor (`.env.dist`)",
+        "dotenv",
+        "Cada variable con su valor por defecto y su explicación. Las notas "
+        "marcadas como `SECURITY / UPGRADE NOTE` avisan de cambios que rompen "
+        "instalaciones existentes: son el sitio donde mirar cuando algo deja de "
+        "funcionar justo después de actualizar.",
+    ),
+}
+
 # El cuaderno describe el programa **publicado**: la documentación técnica se
 # toma del último tag, no de `main`, para que no explique funciones que quien
 # pregunta todavía no tiene. Lo que está por llegar vive concentrado en dos
@@ -299,6 +323,22 @@ def reunir_documentos(repo: Path, extras: dict[str, Path]) -> dict[str, str]:
             partes.append(ruta.read_text(encoding="utf-8").strip())
         if len(partes) > 1:
             documentos[titulo] = "\n".join(partes) + "\n"
+
+    for titulo, (relativa, encabezado, lenguaje, nota) in ENVUELTOS.items():
+        # Del tag publicado, igual que INCLUIR: el cuaderno describe lo instalado.
+        contenido = subprocess.run(
+            ["git", "-C", str(repo), "show", f"{version}:{relativa}"],
+            capture_output=True, text=True).stdout
+        if not contenido.strip():
+            registrar(f"  aviso: {relativa} no está en la {version}")
+            continue
+        documentos[titulo] = "\n".join([
+            f"# {encabezado}", "",
+            *aviso_publicado(version, adelanto), "",
+            f"> {nota}", "",
+            f"<!-- {relativa} -->", "",
+            f"```{lenguaje}", contenido.strip(), "```", "",
+        ])
 
     return documentos
 
