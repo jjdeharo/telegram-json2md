@@ -19,6 +19,7 @@ import hashlib
 import json
 import subprocess
 import sys
+import urllib.parse
 import urllib.request
 from datetime import date
 from pathlib import Path
@@ -99,7 +100,11 @@ MATERIAL_EXTERNO = {
     "Requisitos de calidad de Situaciones de Aprendizaje (REA).pdf": {
         "que_es": "Requisitos de calidad de SdA-REA, de CEDEC",
         "desde": "junio de 2025",
-        "vigilar": "https://descargas.intef.es/cedec/protocoloexe/calidad_rea/content.xml",
+        # El recurso está exportado como sitio web y nunca tuvo `content.xml`: esa
+        # dirección redirigía a la portada de INTEF, cuya huella cambia cada día.
+        # Se vigila el PDF, que es justamente la fuente que está en el cuaderno.
+        "vigilar": "https://descargas.intef.es/cedec/protocoloexe/calidad_rea/"
+                   "Requisitos_de_calidad_de_SdA-REA.pdf",
         "pagina": "https://cedec.intef.es/requisitos-de-calidad-de-rea-como-"
                   "situaciones-de-aprendizaje/",
     },
@@ -119,6 +124,12 @@ MATERIAL_EXTERNO = {
 }
 
 
+def destino(url: str) -> tuple[str, str]:
+    """Servidor y ruta de una dirección, para ver si una redirección se salió."""
+    partes = urllib.parse.urlsplit(url)
+    return partes.netloc, partes.path
+
+
 def revisar_material_externo(propio: dict, presentes: set[str]) -> tuple[list[str], bool]:
     """Comprueba que el material de fuera sigue en pie, y si su original cambió.
 
@@ -135,6 +146,12 @@ def revisar_material_externo(propio: dict, presentes: set[str]) -> tuple[list[st
             pendiente = True
         try:
             with urllib.request.urlopen(ficha["vigilar"], timeout=60) as r:
+                # Si el servidor redirige fuera del recurso, lo que llega es otra
+                # página —la portada de quien lo publicaba— y su huella cambia
+                # sola. Compararla daría un aviso diario que no dice nada: es un
+                # enlace roto, y como tal hay que contarlo.
+                if destino(r.geturl()) != destino(ficha["vigilar"]):
+                    raise RuntimeError(f"redirige a {r.geturl()}")
                 huella = hashlib.sha256(r.read()).hexdigest()
         except Exception as error:  # noqa: BLE001
             avisos.append(f"no se pudo comprobar el original ({error})")
