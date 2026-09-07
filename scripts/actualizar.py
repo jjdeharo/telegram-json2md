@@ -170,7 +170,11 @@ async def procesar_grupo(cliente, grupo: dict, estado: dict, hasta: date,
         resumen["meses"].append({"mes": mes, "cambio": True, "subido": True})
         resumen["subidas"] += 1
 
-    previo["ultimo_dia"] = hasta.isoformat()
+    # Una pasada en seco no adelanta el reloj del grupo: si lo hiciera, la
+    # siguiente pasada real vería el grupo «al día» y el mes recién regenerado
+    # se quedaría sin subir. Y en seco es justo como comprueba el reparador.
+    if subir:
+        previo["ultimo_dia"] = hasta.isoformat()
     return resumen
 
 
