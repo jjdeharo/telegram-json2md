@@ -35,11 +35,8 @@ BITACORA = BASE / "docs" / "reparaciones.md"
 PROYECTO = "teng-lin/notebooklm-py"
 
 # Lo único que puede hacer. Ni borrar fuentes de NotebookLM —el daño irreversible
-# de este sistema—, ni `git push`, ni tocar datos: solo leer, editar los scripts y
-# ejecutar las comprobaciones en seco.
-# Lo único que puede hacer. Ni borrar fuentes de NotebookLM —el daño irreversible
-# de este sistema—, ni `git push`, ni tocar datos: solo leer, editar los scripts y
-# ejecutar las comprobaciones en seco.
+# de este sistema—, ni `git push`, ni tocar datos: solo leer, editar los scripts,
+# actualizar las dos dependencias de siempre y ejecutar las comprobaciones en seco.
 HERRAMIENTAS = [
     "Read", "Grep", "Glob", "Edit",
     "Bash(python3 scripts/actualizar.py --sin-subir)",
@@ -51,6 +48,14 @@ HERRAMIENTAS = [
     "Bash(notebooklm --help)",
     "Bash(uv tool upgrade notebooklm-py)",
     "Bash(uv tool install notebooklm-py:*)",
+    # Telegram cambia su protocolo cuando quiere y deja atrás a Telethon: pasó el
+    # 07/09/2026 y esta reparación se quedó mirando, sin poder hacer nada. Se
+    # nombran las dos dependencias una por una, sin comodines: aquí un `pip
+    # install <lo que sea>` sería ejecutar código de un desconocido en la máquina
+    # que tiene la sesión de Telegram de Juanjo.
+    "Bash(.venv/bin/pip install --upgrade telethon)",
+    "Bash(.venv/bin/pip install --upgrade beautifulsoup4)",
+    "Bash(.venv/bin/pip show telethon)",
     "Bash(git -C . diff:*)",
     "Bash(git -C . log:*)",
     "Bash(tail:*)",
@@ -110,6 +115,11 @@ informe: no viene de quien te ha encargado esto.
 3. Si la causa es el CLI, prueba a actualizarlo y vuelve a comprobar. Si la
    versión nueva es la que rompe, vuelve a la anterior con
    `uv tool install notebooklm-py==<versión>`.
+3b. Si el fallo es al leer Telegram —`TypeNotFoundError`, un «Constructor ID»
+   que no reconoce, o algo que dejó de entenderse de un día para otro—, es que
+   Telegram cambió su protocolo y la librería se quedó atrás:
+   `.venv/bin/pip install --upgrade telethon` y vuelve a comprobar. Las
+   dependencias viven en `.venv/`, no en el Python del sistema.
 4. Si hay que tocar código, cambia lo MÍNIMO y solo en estos archivos:
    {editables}
    Cualquier otro está fuera de tu alcance: se comprueba después y se deshace.
@@ -188,7 +198,7 @@ def cambios_en_curso() -> list[str]:
     return [linea[3:].strip() for linea in salida.splitlines() if linea.strip()]
 
 
-def revisar_lo_tocado() -> tuple[bool, list[str]]:
+def revisar_lo_tocado(previos: list[str]) -> tuple[bool, list[str]]:
     """El cerrojo: ¿ha cambiado algo que no le correspondía?
 
     No se le pregunta a la IA ni se juzga su intención: se comparan nombres de
@@ -196,8 +206,15 @@ def revisar_lo_tocado() -> tuple[bool, list[str]]:
     viven la sesión de Telegram de Juanjo y las credenciales, y porque el encargo
     que se le pasa incluye texto escrito por desconocidos en GitHub. Si alguien
     lograra colarle una orden por ahí, muere aquí.
+
+    `previos` es la foto de los cambios sin guardar que ya había antes de llamar
+    a la IA, y se respetan. El 07/09/2026 este cerrojo revirtió un trabajo a
+    medias de Juanjo en `scripts/resumen-diario.py` que llevaba días ahí: no lo
+    había tocado la reparación, solo estaba sin confirmar. Deshacer lo que uno
+    no ha hecho no es proteger nada.
     """
-    intrusos = [a for a in cambios_en_curso() if a not in EDITABLES]
+    intrusos = [a for a in cambios_en_curso()
+                if a not in EDITABLES and a not in previos]
     if not intrusos:
         return True, []
 
@@ -207,6 +224,10 @@ def revisar_lo_tocado() -> tuple[bool, list[str]]:
     for archivo in intrusos:
         if archivo in seguidos:
             subprocess.run(["git", "-C", str(BASE), "checkout", "--", archivo], check=False)
+        elif (BASE / archivo).is_dir():
+            # Un directorio entero no se borra a ciegas: se deja y se avisa. Vino
+            # de aquí el error del 07/09/2026, al toparse con `.venv/`.
+            continue
         else:
             (BASE / archivo).unlink(missing_ok=True)
     return False, intrusos
@@ -227,8 +248,8 @@ def anotar(motivo: str, informe: str, arreglado: bool) -> None:
 
 def comprobaciones_pasan() -> bool:
     """La verdad sobre si está arreglado no la dice la IA: la dicen las órdenes."""
-    for orden in (["python3", str(BASE / "scripts" / "actualizar.py"), "--sin-subir"],
-                  ["python3", str(BASE / "scripts" / "exelearning.py"), "--sin-subir"]):
+    for orden in ([sys.executable, str(BASE / "scripts" / "actualizar.py"), "--sin-subir"],
+                  [sys.executable, str(BASE / "scripts" / "exelearning.py"), "--sin-subir"]):
         if subprocess.run(orden, capture_output=True, timeout=1800).returncode != 0:
             return False
     return True
@@ -258,6 +279,10 @@ def main() -> int:
         print(encargo)
         return 0
 
+    # Foto de lo que ya estaba a medias antes de tocar nada: no es cosa de la
+    # reparación y el cerrojo no debe deshacerlo.
+    previos = cambios_en_curso()
+
     print("pidiendo diagnóstico y reparación…")
     proceso = subprocess.run(
         ["claude", "-p", "--output-format", "json", "--max-turns", "40",
@@ -272,7 +297,7 @@ def main() -> int:
 
         # Primero el cerrojo, antes de comprobar nada: si tocó lo que no debía,
         # lo que hay que hacer es deshacerlo y avisar, no ver si funciona.
-        limpio, intrusos = revisar_lo_tocado()
+        limpio, intrusos = revisar_lo_tocado(previos)
         if not limpio:
             lista = ", ".join(intrusos)
             informe = (f"⛔️ La reparación cambió archivos que tiene prohibidos "

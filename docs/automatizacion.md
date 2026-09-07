@@ -210,6 +210,19 @@ todo lo que toca la cuenta de Telegram de Juanjo y las credenciales, que es dond
 un cambio malicioso haría daño de verdad: escribir en su nombre a tres grupos con
 cientos de personas.
 
+Ese cerrojo respeta lo que ya estaba a medias antes de la reparación: toma una
+foto de los cambios sin guardar al empezar y solo deshace lo que aparezca
+después. El 07/09/2026 no lo hacía, y revirtió un trabajo sin confirmar de Juanjo
+en `scripts/resumen-diario.py` que llevaba días ahí. Tampoco borra directorios a
+ciegas —se topó con `.venv/` y se cayó con él—: los deja y los denuncia.
+
+En las órdenes que puede ejecutar hay una excepción a la regla de no instalar
+nada: actualizar Telethon y BeautifulSoup, nombradas una por una y sin
+comodines. Sin eso, el fallo del 07/09/2026 —Telegram cambió el protocolo y la
+librería se quedó atrás— era irreparable de madrugada, que es justo para lo que
+está esto. Un `pip install <lo que sea>` sí sería grave: ejecutaría código de un
+desconocido en la máquina que guarda la sesión de Telegram.
+
 Y su palabra no basta: quien decide si está arreglado es
 `comprobaciones_pasan()`, que vuelve a ejecutar las dos pasadas en seco. Si la IA
 dice que lo ha resuelto y las comprobaciones fallan, el aviso que sale es el de
