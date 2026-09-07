@@ -14,6 +14,14 @@ BASE="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
 ORDEN="$BASE/scripts/diario.sh --auto"
 MARCA="# memoria-telegram: conversaciones diarias en NotebookLM"
 
+# Las dependencias van en el entorno del proyecto, no en el del sistema: ver
+# docs/automatizacion.md. Si ya está montado, no se toca.
+if [ ! -x "$BASE/.venv/bin/python" ]; then
+  echo "Montando el entorno de Python en .venv…"
+  python3 -m venv "$BASE/.venv"
+  "$BASE/.venv/bin/pip" install --quiet --upgrade pip -r "$BASE/requirements.txt"
+fi
+
 actual="$(crontab -l 2>/dev/null || true)"
 # Se filtran las líneas propias por la ruta, no por posición: así conviven con
 # las del boletín semanal, que están en el mismo crontab.

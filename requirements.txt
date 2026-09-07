@@ -1,0 +1,6 @@
+# Dependencias del proyecto. Viven en .venv/ y no en el Python del sistema:
+# la Telethon de Debian se quedó atrás y Telegram dejó de entenderse con ella.
+#
+#   python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+telethon>=1.44
+beautifulsoup4>=4.12

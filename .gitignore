@@ -20,3 +20,6 @@ __pycache__/
 *.pyc
 prompt.txt
 material/
+
+# Entorno de Python del proyecto (se rehace con requirements.txt)
+.venv/

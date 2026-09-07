@@ -24,6 +24,10 @@ from pathlib import Path
 BASE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE / "scripts"))
 
+from entorno import usar_venv  # noqa: E402
+
+usar_venv()
+
 import exportar  # noqa: E402
 import generar  # noqa: E402
 import notebook  # noqa: E402

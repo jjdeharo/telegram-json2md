@@ -153,6 +153,28 @@ python3 scripts/actualizar-cli.py --solo-ver  # solo decir si hay novedad
 
 Si algo falla, se vuelve atrás con `uv tool install notebooklm-py==<versión>`.
 
+### El entorno de Python es del proyecto, no del sistema
+
+Telethon (leer Telegram) y BeautifulSoup (el manual de eXeLearning) viven en
+`.venv/`, dentro del propio repositorio, y no en el Python de Debian. El motivo
+tiene fecha: el 07/09/2026 la pasada falló entera porque Telegram estrenó un
+constructor —`0x1c32b11c`— que la Telethon del sistema, una 1.25.1 de hace años,
+no sabía leer; dos de los tres grupos dejaron de exportarse de un día para otro.
+Telegram cambia su protocolo cuando quiere y Debian congela versiones durante
+años: son dos ritmos que no se llevan bien.
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/pip install --upgrade telethon    # cuando Telegram vuelva a cambiar
+```
+
+No hay que acordarse de activar nada. `scripts/entorno.py` se encarga: cada
+punto de entrada llama a `usar_venv()` como primera instrucción y, si lo han
+lanzado con otro intérprete, se reejecuta a sí mismo con el del venv. Da igual
+que la orden venga de cron, de tus manos o del reparador automático. Si el venv
+no existiera, se sigue con el Python del sistema: es mejor intentarlo y fallar
+con el error de verdad que negarse a arrancar.
+
 ## Cuando algo se rompe, se busca la solución
 
 Un fallo a las siete de la mañana no tiene a nadie delante, y dejarlo esperando a
@@ -254,6 +276,7 @@ dice si cron llegó a dispararse.
 | `La sesión de Telegram no está autorizada` | Sesión revocada o caducada | Borrar `sesion/telegram.session` y ejecutar `actualizar.py` a mano para meter el código |
 | El mes aparece duplicado en el notebook | Una subida se quedó a medias | Se arregla sola en la siguiente pasada |
 | Un grupo falla y los otros no | Es el comportamiento previsto | Se avisa al final; el resto se procesa igual |
+| `TypeNotFoundError: Could not find a matching Constructor ID` | Telegram cambió el protocolo y Telethon se quedó atrás | `.venv/bin/pip install --upgrade telethon` |
 | Nada se ejecuta por la mañana | Cron no está instalado | `crontab -l` y, si falta, `scripts/instalar.sh` |
 
 Para rehacer un tramo concreto:

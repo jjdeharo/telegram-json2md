@@ -53,9 +53,9 @@ def funciona() -> tuple[bool, str]:
     """
     pruebas = [
         (["notebooklm", "auth", "check", "--test", "--json"], "el CLI ya no habla con NotebookLM"),
-        (["python3", str(BASE / "scripts" / "actualizar.py"), "--sin-subir"],
+        ([sys.executable, str(BASE / "scripts" / "actualizar.py"), "--sin-subir"],
          "el archivado de las conversaciones falla"),
-        (["python3", str(BASE / "scripts" / "exelearning.py"), "--sin-subir"],
+        ([sys.executable, str(BASE / "scripts" / "exelearning.py"), "--sin-subir"],
          "la sincronización de eXeLearning falla"),
     ]
     for orden, queja in pruebas:

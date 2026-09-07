@@ -35,6 +35,12 @@ from datetime import datetime
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BASE / "scripts"))
+
+from entorno import usar_venv  # noqa: E402
+
+usar_venv()
+
 CONFIG = BASE / "config.json"
 SESION = BASE / "sesion" / "telegram"
 BITACORA = BASE / "registro" / "avisos.log"

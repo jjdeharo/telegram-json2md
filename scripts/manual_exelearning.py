@@ -10,9 +10,15 @@ Se rehace de tanto en tanto, cuando sale una versión nueva del manual:
 
     python3 scripts/manual_exelearning.py
 """
-import re, subprocess, urllib.parse, urllib.request
-from bs4 import BeautifulSoup
+import re, subprocess, sys, urllib.parse, urllib.request
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from entorno import usar_venv  # noqa: E402
+
+usar_venv()
+
+from bs4 import BeautifulSoup  # noqa: E402
 
 DESTINO = Path(__file__).resolve().parent.parent / "material" / "exelearning" / "manual-exelearning-4.0.1.md"
 

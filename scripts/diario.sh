@@ -18,6 +18,12 @@ export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 
 BASE="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
 REGISTRO="$BASE/registro"
+
+# Las dependencias (Telethon, BeautifulSoup) viven en el entorno del proyecto,
+# no en el del sistema: ver scripts/entorno.py. Si el venv no estuviera, se sigue
+# con el Python del sistema, que es mejor que no arrancar.
+PY="$BASE/.venv/bin/python"
+[ -x "$PY" ] || PY="python3"
 HOY="$(date +%F)"
 MARCA="$REGISTRO/.hecho-$HOY"
 LOG="$REGISTRO/diario-$HOY.log"
@@ -68,9 +74,9 @@ esperar "sesión gráfica" 120 xset q || true
 # propio ritmo, así que se sincroniza siempre, pero un fallo suyo no invalida el
 # archivado del día: se anota y se reintenta mañana.
 sincronizar_exelearning() {
-  python3 "$BASE/scripts/exelearning.py" && return 0
+  "$PY" "$BASE/scripts/exelearning.py" && return 0
   reparar "la sincronización de la documentación de eXeLearning falló" &&
-    python3 "$BASE/scripts/exelearning.py" && return 0
+    "$PY" "$BASE/scripts/exelearning.py" && return 0
   printf '%s  eXeLearning sigue fallando; se reintentará mañana\n' "$(date '+%F %T')"
 }
 
@@ -85,11 +91,11 @@ sincronizar_exelearning() {
 # juicio se le pide a un Claude sin sesión interactiva. Lo que decida queda en las
 # listas, en la bitácora y en un commit. Si no encuentra nada, no hace nada.
 revisar_exelearning() {
-  python3 "$BASE/scripts/revisar-exelearning.py" >/dev/null || {
+  "$PY" "$BASE/scripts/revisar-exelearning.py" >/dev/null || {
     printf '%s  la revisión de eXeLearning falló; se reintenta mañana\n' "$(date '+%F %T')"
     return 0
   }
-  python3 "$BASE/scripts/decidir-exelearning.py" ||
+  "$PY" "$BASE/scripts/decidir-exelearning.py" ||
     printf '%s  la decisión automática falló; se reintenta mañana\n' "$(date '+%F %T')"
 }
 
@@ -100,11 +106,11 @@ revisar_exelearning() {
 # puede borrar fuentes ni tocar los datos. Si lo arregla, se reintenta la pasada.
 reparar() {   # reparar <motivo>
   printf '%s  fallo: %s. Buscando solución…\n' "$(date '+%F %T')" "$1"
-  python3 "$BASE/scripts/reparar.py" --motivo "$1" --registro "$LOG"
+  "$PY" "$BASE/scripts/reparar.py" --motivo "$1" --registro "$LOG"
 }
 
-if python3 "$BASE/scripts/actualizar.py" || { reparar "el archivado de las conversaciones falló" &&
-     python3 "$BASE/scripts/actualizar.py"; }; then
+if "$PY" "$BASE/scripts/actualizar.py" || { reparar "el archivado de las conversaciones falló" &&
+     "$PY" "$BASE/scripts/actualizar.py"; }; then
   sincronizar_exelearning
   revisar_exelearning
   # La marca se pone solo si la pasada terminó bien. Si falló, los disparos del
@@ -113,13 +119,13 @@ if python3 "$BASE/scripts/actualizar.py" || { reparar "el archivado de las conve
   # Y por último, si ha salido versión nueva del CLI de NotebookLM: se instala, se
   # comprueba que todo sigue en pie y, si la nueva rompe algo, se vuelve sola a la
   # anterior. Va al final y sin condicionar nada, con el día ya archivado.
-  python3 "$BASE/scripts/actualizar-cli.py" || true
+  "$PY" "$BASE/scripts/actualizar-cli.py" || true
 
   # Y el parte del día por Telegram. Va al final, cuando ya se sabe todo lo que
   # ha pasado, y es lo único que se manda los días en que no ocurre nada: sin
   # esto, un día normal sería indistinguible de un día en que cron no llegó a
   # dispararse.
-  python3 "$BASE/scripts/resumen-diario.py" >/dev/null 2>&1 || true
+  "$PY" "$BASE/scripts/resumen-diario.py" >/dev/null 2>&1 || true
   touch "$MARCA"
   find "$REGISTRO" -maxdepth 1 -name '.hecho-*' -mtime +7 -delete
   find "$REGISTRO" -maxdepth 1 -name 'diario-*.log' -mtime +60 -delete
