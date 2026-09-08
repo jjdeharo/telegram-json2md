@@ -8,9 +8,10 @@
 
 ## Qué ocurre cada día
 
-1. **A las 7:00** (o en cuanto arranca el contenedor —o el ordenador, si es un
-   equipo de escritorio— con el día pendiente) se lanza `scripts/diario.sh`, que
-   espera a que haya red y llama a `scripts/actualizar.py`.
+1. **A las 4:00** en el NAS —a las 7:00 en un equipo de escritorio, que a esa
+   hora está apagado—, o en cuanto arranca con el día pendiente, se lanza
+   `scripts/diario.sh`, que espera a que haya red y llama a
+   `scripts/actualizar.py`.
 2. Para cada uno de los tres grupos:
    - Se calcula lo pendiente: desde el día siguiente al último procesado
      —`estado.json`— **hasta ayer**. El día en curso no entra nunca: aún no ha
@@ -77,7 +78,7 @@ Solo existen donde hay escritorio: en el NAS `avisar.sh` no encuentra
   una pila de avisos.
 - Al terminar, un aviso breve que se desvanece solo.
 - Si algo falla, un **cartel fijo con sonido** que se queda hasta que se lea: el
-  proceso corre a las siete de la mañana y puede no haber nadie delante.
+  proceso corre de madrugada y no hay nadie delante.
 
 Se pueden probar sueltos:
 
@@ -190,7 +191,7 @@ con el error de verdad que negarse a arrancar.
 
 ## Cuando algo se rompe, se busca la solución
 
-Un fallo a las siete de la mañana no tiene a nadie delante, y dejarlo esperando a
+Un fallo de madrugada no tiene a nadie delante, y dejarlo esperando a
 que alguien lea un cartel cuesta días de archivo. Así que la pasada diaria, si
 falla, le da el problema a un Claude sin sesión interactiva junto con el registro
 del fallo, la versión instalada del CLI, las notas de la última publicación y las

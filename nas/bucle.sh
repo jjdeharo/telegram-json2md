@@ -6,13 +6,17 @@
 # este bucle hace de los cuartos de hora. La idempotencia sigue siendo de
 # diario.sh: la marca del día corta los disparos sobrantes, así que llamarlo de
 # más no cuesta nada y llamarlo de menos sí.
+#
+# Empieza a las 4 de la mañana y no a las 7: el NAS no se apaga, así que no hay
+# ninguna razón para esperar a que haya alguien delante, y a esa hora ni
+# Telegram ni NotebookLM tienen tráfico.
 set -u
 
 PASADA=/proyecto/scripts/diario.sh
 
 while true; do
   hora=$((10#$(date +%H)))          # 10# para que las 08 y las 09 no sean octal
-  if [ "$hora" -ge 7 ] && [ "$hora" -le 23 ]; then
+  if [ "$hora" -ge 4 ] && [ "$hora" -le 23 ]; then
     if [ -x "$PASADA" ]; then
       "$PASADA" --auto || true
     else

@@ -139,7 +139,7 @@ Mira siempre primero `registro/diario-<fecha>.log`.
   entero** (así se cura solo tras huecos o apagones), regenera el `.md` y, si su
   huella difiere de la de lo último subido, sustituye la fuente del notebook.
 - `scripts/diario.sh` es la pasada. En el NAS la dispara `nas/bucle.sh` cada 15
-  minutos de 7 a 23 —y el arranque del contenedor hace de `@reboot`—, con marca
+  minutos de 4 a 23 —y el arranque del contenedor hace de `@reboot`—, con marca
   de día hecho y cerrojo, esperando a que haya red. Si una pasada falla, no deja
   marca y el siguiente disparo reintenta. En el portátil lo lanzaba cron, y
   `scripts/instalar.sh` sigue ahí por si hubiera que volver.

@@ -47,6 +47,12 @@ arranque del contenedor hace de `@reboot` y el bucle, de cuartos de hora. La
 idempotencia sigue siendo de `diario.sh`, que corta los disparos sobrantes con la
 marca del día.
 
+**La pasada arranca a las 4 de la mañana**, no a las 7 como en el portátil: el
+NAS no se apaga, así que no hay que esperar a que haya alguien delante, y a esa
+hora ni Telegram ni NotebookLM tienen tráfico. Los cuartos de hora siguen hasta
+las 23, que son los reintentos por si algo falla. Para moverla, se cambia la
+ventana en `nas/bucle.sh` y se reconstruye la imagen: el fichero va dentro.
+
 `restart: unless-stopped` se ocupa de que un reinicio del NAS lo vuelva a
 levantar. **No hay que instalar nada en el crontab del NAS.**
 
