@@ -1,10 +1,16 @@
 # Cómo funciona la actualización diaria
 
+> **Dónde corre esto.** Desde el 08/09/2026, en el NAS, dentro del contenedor
+> `memoria-telegram` —para no depender de que el portátil esté encendido—. El
+> proceso es el que se describe aquí; lo que cambia es el disparo, que allí lo
+> hace el bucle del contenedor en vez de cron, y que no hay pantalla a la que
+> avisar. El detalle, en [nas.md](nas.md).
+
 ## Qué ocurre cada día
 
-1. **A las 7:00** (o en cuanto el ordenador se enciende, si estaba apagado) cron
-   lanza `scripts/diario.sh`, que espera a que haya red y sesión gráfica y llama
-   a `scripts/actualizar.py`.
+1. **A las 7:00** (o en cuanto arranca el contenedor —o el ordenador, si es un
+   equipo de escritorio— con el día pendiente) se lanza `scripts/diario.sh`, que
+   espera a que haya red y llama a `scripts/actualizar.py`.
 2. Para cada uno de los tres grupos:
    - Se calcula lo pendiente: desde el día siguiente al último procesado
      —`estado.json`— **hasta ayer**. El día en curso no entra nunca: aún no ha
@@ -41,16 +47,20 @@ El mes nuevo se crea como fuente nueva y el anterior queda cerrado, sin volver a
 tocarse. Ese día se suben los dos: el último día del mes que termina y el primero
 del que empieza.
 
-## Los dos disparos de cron
+## Los dos disparos
+
+En el NAS los pone `nas/bucle.sh`: el arranque del contenedor hace de `@reboot` y
+el bucle repite cada cuarto de hora entre las 7 y las 23. En un ordenador de
+escritorio los pone cron, con `scripts/instalar.sh`:
 
 ```cron
 @reboot          .../scripts/diario.sh --auto
 */15 7-23 * * *  .../scripts/diario.sh --auto
 ```
 
-- El de **`@reboot`** cubre el caso de encender el ordenador con el día pendiente.
-- El de **cada cuarto de hora** cubre que ya estuviera encendido, y también que
-  al encender no hubiera red todavía.
+- El de **`@reboot`** cubre el caso de arrancar con el día pendiente.
+- El de **cada cuarto de hora** cubre que ya estuviera en marcha, y también que
+  al arrancar no hubiera red todavía.
 
 Ninguno de los dos duplica trabajo: en cuanto una pasada termina bien se deja la
 marca `registro/.hecho-<fecha>` y el resto de disparos del día no hacen nada.
@@ -59,6 +69,9 @@ corte de red pasajero se arregla solo. Además hay un cerrojo (`flock`) para el
 momento en que coinciden el disparo de arranque y el del cuarto de hora.
 
 ## Los avisos en pantalla
+
+Solo existen donde hay escritorio: en el NAS `avisar.sh` no encuentra
+`notify-send` y sale limpio, sin romper nada. Allí lo que avisa es Telegram.
 
 - El progreso va en **una sola notificación que se reescribe** en su sitio, nunca
   una pila de avisos.
@@ -285,12 +298,12 @@ dice si cron llegó a dispararse.
 
 | Síntoma | Qué pasa | Solución |
 |---|---|---|
-| `la sesión de NotebookLM ha caducado` | Las cookies dejan de valer cada cierto tiempo | `notebooklm login` |
+| `la sesión de NotebookLM ha caducado` | Las cookies dejan de valer cada cierto tiempo | `notebooklm login` en un equipo con navegador y copiar `~/.notebooklm/` al NAS: ver [nas.md](nas.md) |
 | `La sesión de Telegram no está autorizada` | Sesión revocada o caducada | Borrar `sesion/telegram.session` y ejecutar `actualizar.py` a mano para meter el código |
 | El mes aparece duplicado en el notebook | Una subida se quedó a medias | Se arregla sola en la siguiente pasada |
 | Un grupo falla y los otros no | Es el comportamiento previsto | Se avisa al final; el resto se procesa igual |
 | `TypeNotFoundError: Could not find a matching Constructor ID` | Telegram cambió el protocolo y Telethon se quedó atrás | `.venv/bin/pip install --upgrade telethon` |
-| Nada se ejecuta por la mañana | Cron no está instalado | `crontab -l` y, si falta, `scripts/instalar.sh` |
+| Nada se ejecuta por la mañana | El contenedor no está en pie (o, en escritorio, falta el cron) | `docker ps --filter name=memoria-telegram` y `docker compose up -d`; en escritorio, `crontab -l` y `scripts/instalar.sh` |
 
 Para rehacer un tramo concreto:
 

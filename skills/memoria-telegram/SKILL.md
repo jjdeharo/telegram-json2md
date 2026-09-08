@@ -9,7 +9,20 @@ Tres grupos públicos de Telegram se archivan como Markdown mensual y ese
 Markdown es la fuente de un notebook de NotebookLM por grupo. **El proceso ya
 está automatizado y corre solo cada mañana**: normalmente no hay nada que hacer.
 
-Repositorio: `~/Documentos/github/automatizaciones/memoria-telegram`
+**Dónde corre**: desde el 08/09/2026, en el NAS —`ssh jjdeharo@192.168.1.113`,
+contenedor `memoria-telegram`, repositorio en
+`/volume1/docker/memoria-telegram/repo`—, no en el portátil. Ahí es donde hay
+que mirar los registros y ejecutar las órdenes de esta skill. El clon del
+portátil (`~/Documentos/github/automatizaciones/memoria-telegram`) sigue siendo
+donde se desarrolla, pero **no archiva nada**: su cron se retiró. Cómo se opera
+el contenedor está en `docs/nas.md`.
+
+Todas las órdenes de abajo se lanzan dentro del contenedor:
+
+```bash
+ssh jjdeharo@192.168.1.113
+docker exec -it memoria-telegram bash    # y ya estás en /proyecto
+```
 
 | Grupo | Telegram | Carpeta | Notebook |
 |---|---|---|---|
@@ -23,9 +36,11 @@ no se versiona. Léelo de ahí; no los pidas ni los inventes.
 ## Lo primero: comprobar si hay algo que hacer
 
 ```bash
-cd ~/Documentos/github/automatizaciones/memoria-telegram
+ssh jjdeharo@192.168.1.113
+cd /volume1/docker/memoria-telegram/repo          # el registro se lee sin entrar
 cat registro/diario-$(date +%F).log 2>/dev/null   # ¿corrió hoy?, ¿cómo acabó?
-tail -5 registro/disparos.log                     # ¿llegó a dispararse cron?
+tail -5 registro/disparos.log                     # ¿llegó a dispararse el bucle?
+docker ps --filter name=memoria-telegram          # ¿está el contenedor en pie?
 python3 -c "import json;print(json.load(open('estado.json'))['actualizado'])"
 ```
 
@@ -41,8 +56,8 @@ python3 scripts/actualizar.py --desde 2026-08-01  # rehacer desde una fecha
 python3 scripts/actualizar.py --sin-subir         # generar sin tocar NotebookLM
 ```
 
-Es idempotente: repetirlo no duplica nada. Tarda uno o dos minutos y va avisando
-en pantalla. Nunca procesa el día en curso, solo días terminados.
+Es idempotente: repetirlo no duplica nada. Tarda uno o dos minutos. Nunca
+procesa el día en curso, solo días terminados.
 
 ## El cuaderno de eXeLearning lleva algo más
 
@@ -109,12 +124,12 @@ Mira siempre primero `registro/diario-<fecha>.log`.
 
 | Síntoma | Solución |
 |---|---|
-| `la sesión de NotebookLM ha caducado` | `notebooklm login` (necesita navegador: pídeselo a Juanjo con `!` si no puedes) |
+| `la sesión de NotebookLM ha caducado` | En el NAS no hay navegador: se hace `notebooklm login` en el portátil de Juanjo y se copia de nuevo `~/.notebooklm/` a `/volume1/docker/memoria-telegram/home/`. Ver `docs/nas.md` |
 | Nada funciona con NotebookLM y la sesión es válida | El CLI es una herramienta no oficial y se rompe cuando Google cambia algo. `python3 scripts/actualizar-cli.py` instala la versión nueva y comprueba; si rompe, vuelve sola atrás |
 | `La sesión de Telegram no está autorizada` | Borrar `sesion/telegram.session` y ejecutar `actualizar.py` a mano: pedirá el código por Telegram |
 | Un mes duplicado en el notebook | Se arregla solo en la siguiente pasada; si urge, borra la fuente más antigua de ese título |
 | Un grupo falla y los otros no | Es lo previsto. Reintenta ese grupo con `--solo <prefijo>` |
-| Nada se ejecuta por la mañana | `crontab -l`; si faltan las líneas, `scripts/instalar.sh` |
+| Nada se ejecuta por la mañana | El disparo ya no es cron sino el bucle del contenedor: `docker ps --filter name=memoria-telegram` y, si no está, `cd /volume1/docker/memoria-telegram && docker compose up -d` |
 | El notebook no tiene un mes que sí está en `salida/` | Borra su entrada en `estado.json` y ejecuta `--desde` del día 1 de ese mes |
 
 ## Cómo está montado
@@ -123,9 +138,11 @@ Mira siempre primero `registro/diario-<fecha>.log`.
   calcula lo pendiente desde `estado.json` hasta ayer, reexporta **el mes natural
   entero** (así se cura solo tras huecos o apagones), regenera el `.md` y, si su
   huella difiere de la de lo último subido, sustituye la fuente del notebook.
-- `scripts/diario.sh` es lo que lanza cron: `@reboot` y cada 15 minutos de 7 a
-  23, con marca de día hecho y cerrojo, esperando a que haya red y sesión
-  gráfica. Si una pasada falla, no deja marca y el siguiente disparo reintenta.
+- `scripts/diario.sh` es la pasada. En el NAS la dispara `nas/bucle.sh` cada 15
+  minutos de 7 a 23 —y el arranque del contenedor hace de `@reboot`—, con marca
+  de día hecho y cerrojo, esperando a que haya red. Si una pasada falla, no deja
+  marca y el siguiente disparo reintenta. En el portátil lo lanzaba cron, y
+  `scripts/instalar.sh` sigue ahí por si hubiera que volver.
 - `scripts/podar.py` corre al final de cada pasada: comprime las exportaciones
   JSON de más de tres meses y recorta `estado.json`. **No es pérdida de datos**:
   las conversaciones de `salida/` se guardan enteras y para siempre, y un mes

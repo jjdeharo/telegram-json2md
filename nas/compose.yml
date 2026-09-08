@@ -1,0 +1,31 @@
+# La memoria de Telegram, corriendo en el NAS.
+#
+#   docker compose up -d --build     construir y arrancar
+#   docker compose logs -f           ver el bucle
+#   docker exec -it memoria-telegram bash    entrar a operar a mano
+#
+# Nada de lo que importa vive dentro del contenedor: el repositorio, los datos,
+# las conversaciones y las tres sesiones —Telegram, NotebookLM y Claude— están
+# en los volúmenes de abajo, en /volume1/docker/memoria-telegram.
+services:
+  memoria-telegram:
+    build: .
+    image: memoria-telegram:local
+    container_name: memoria-telegram
+    restart: unless-stopped
+    user: "1000:10"
+    environment:
+      TZ: Europe/Madrid
+      HOME: /home/jjdeharo
+    volumes:
+      # El repositorio, con sus datos dentro (datos/, salida/, sesion/,
+      # registro/, material/, config.json y estado.json). Es lo que se copia del
+      # portátil y lo único que hay que respaldar.
+      - ./repo:/proyecto
+      # Los repositorios de eXeLearning y su ecosistema, que el sincronizador
+      # lee con `git show`. Se clonan una vez y se actualizan solos.
+      - ./repos:/repos
+      # El home persistente: aquí viven las cookies de NotebookLM (~/.notebooklm)
+      # y la sesión de Claude (~/.claude). Sin esto habría que volver a
+      # autorizar en cada reconstrucción de la imagen.
+      - ./home:/home/jjdeharo

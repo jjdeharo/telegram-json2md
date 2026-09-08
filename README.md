@@ -5,8 +5,10 @@ Markdown mensual y mantiene ese Markdown como fuente de un notebook de
 NotebookLM por grupo, de modo que cada notebook es un agente que conoce lo que
 se ha hablado en su grupo.
 
-**Se actualiza solo, cada día**: el ordenador exporta el día anterior, lo añade
-al archivo del mes en curso y refresca la fuente del notebook correspondiente.
+**Se actualiza solo, cada día**: exporta el día anterior, lo añade al archivo del
+mes en curso y refresca la fuente del notebook correspondiente. Corre en el NAS
+de casa, en un contenedor, para no depender de que el ordenador esté encendido
+—ver [docs/nas.md](docs/nas.md)—.
 
 El cuaderno de eXeLearning lleva además el manual de usuario, la documentación
 técnica del proyecto y la de las herramientas que lo rodean —los plugins de
@@ -39,7 +41,8 @@ python3 scripts/exelearning.py                    # documentación de eXeLearnin
 python3 scripts/manual_exelearning.py             # rehacer el manual de usuario
 ```
 
-Instalar o quitar el disparo automático:
+En el NAS el disparo lo lleva el bucle del contenedor y no hay nada que
+instalar. En un ordenador con escritorio, el disparo es cron:
 
 ```bash
 scripts/instalar.sh            # @reboot + cada 15 min de 7:00 a 23:59
@@ -78,6 +81,7 @@ scripts/
   avisar.sh             avisos en pantalla
   diario.sh             la pasada diaria, tal como la lanza cron
   instalar.sh           instala o retira el disparo en el crontab
+nas/                    el contenedor con que corre en el NAS: imagen, composición y reloj
 web/                    conversor JSON → Markdown en el navegador, sin instalar nada
 docs/                   cómo funciona el automatismo y qué formato produce
 fuentes/                documentos escritos a mano que van al cuaderno de eXeLearning

@@ -68,7 +68,10 @@ esperar() {   # esperar <descripción> <segundos> <orden...>
   return 0
 }
 esperar "red" 300 getent hosts notebook.google.com || true
-esperar "sesión gráfica" 120 xset q || true
+# La sesión gráfica solo existe donde hay escritorio. En el NAS, donde la pasada
+# corre en un contenedor sin pantalla, esperarla serían dos minutos tirados en
+# cada disparo: si ni siquiera está `xset`, no hay nada que esperar.
+command -v xset >/dev/null 2>&1 && { esperar "sesión gráfica" 120 xset q || true; } || true
 
 # La documentación de eXeLearning va aparte de las conversaciones y cambia a su
 # propio ritmo, así que se sincroniza siempre, pero un fallo suyo no invalida el

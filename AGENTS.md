@@ -16,6 +16,8 @@ El detalle está en:
 - [docs/automatizacion.md](docs/automatizacion.md) — el flujo diario y qué hacer
   cuando algo falla. **Es la fuente de verdad del automatismo.**
 - [docs/formato-markdown.md](docs/formato-markdown.md) — el formato del Markdown.
+- [docs/nas.md](docs/nas.md) — **dónde corre esto de verdad**: en el NAS, en un
+  contenedor. El clon del portátil se usa para desarrollar, pero no archiva.
 
 Dos reglas que no hay que romper:
 
