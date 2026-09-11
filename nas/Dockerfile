@@ -29,7 +29,7 @@ ENV UV_TOOL_DIR=/opt/uv/tools \
     UV_INSTALL_DIR=/usr/local/bin \
     PATH=/usr/local/bin:/usr/bin:/bin
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
- && uv tool install "notebooklm-py[browser]" \
+ && uv tool install "notebooklm-py[browser,headless]" \
  && chown -R 1000:1000 /opt/uv
 
 # Claude Code, que es quien repara la pasada cuando falla y quien decide qué

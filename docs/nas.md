@@ -64,12 +64,54 @@ navegador en el NAS. Se copiaron del portátil una vez y viven en `home/`.
 | Sesión | Dónde | Cómo se rehace si caduca |
 |---|---|---|
 | Telegram | `repo/sesion/telegram.session` | Es la misma sesión, no una nueva: Telegram no pide código. Si algún día se revoca, hay que autorizarla a mano con `docker exec -it` y el código del móvil. |
-| NotebookLM | `home/.notebooklm/` | `notebooklm login` necesita navegador, así que se hace en el portátil y se vuelve a copiar la carpeta. Para no repetirlo nunca más está `notebooklm login --master-token --account jjdeharo@gmail.com`, que acuña cookies sin navegador. |
+| NotebookLM | `home/.notebooklm/` | Lo primero, `docker exec memoria-telegram notebooklm auth refresh`: desde el master token lo rehace sin navegador y sin salir del NAS (ver abajo). Si eso fallara, se entra en el portátil y se copia `profiles/default/storage_state.json` a `/volume1/docker/memoria-telegram/home/.notebooklm/profiles/default/`. **Con eso valen los dos contenedores**: el del boletín tiene esa misma carpeta montada, no una copia. |
 | Claude | `home/.claude/.credentials.json` y `home/.claude.json` | Copiar de nuevo desde el portátil, o `claude setup-token`. |
 | El bot de avisos | `home/.config/avisar-juanjo/config.json` | Copiar de nuevo desde el portátil. |
 
 El día que el trabajo diario empiece a fallar con «la sesión de NotebookLM ha
 caducado», eso es lo único que hay que rehacer.
+
+**Ojo con el orden**: entrar en NotebookLM desde el portátil **no** arregla el
+NAS. Son dos copias distintas de la sesión, y mientras no se copie el fichero
+los avisos de caducidad siguen llegando. Pasó el 11 de septiembre de 2026.
+
+### El master token, ya puesto
+
+Desde el 11 de septiembre de 2026 el NAS **renueva la sesión él solo, sin
+navegador**:
+
+```bash
+docker exec memoria-telegram notebooklm auth refresh
+```
+
+Responde `ok refreshed: …/profiles/default/storage_state.json`. Vale igual desde
+`boletin-semanal`, porque comparten la carpeta.
+
+**Pero ni eso hace falta**: el CLI lo hace solo cuando le hace falta. Probado el
+11 de septiembre de 2026 rompiendo a mano las cookies de sesión (`SID`,
+`__Secure-1PSID`, `__Secure-3PSID`, `SAPISID`): el `notebooklm list` siguiente
+respondió bien, sin avisar de nada, y dejó el fichero reescrito con cookies
+nuevas. `auth refresh` queda para forzarlo a mano.
+
+Lo que lo hace posible es `home/.notebooklm/profiles/default/master_token.json`,
+acuñado una vez en el portátil con
+`notebooklm -p nas login --master-token --account jjdeharo@gmail.com`. Ese
+bootstrap **sí** necesita una firma con navegador —se queda esperando en la
+ventana de Chromium, sin decir nada en el terminal—, y por eso se hace en el
+portátil; lo que evita es el navegador de todas las veces siguientes. Del perfil
+`nas` del portátil se copiaron al NAS dos ficheros: `master_token.json` y
+`storage_state.json`.
+
+Dos cosas que lo sostienen y conviene no romper:
+
+- Los Dockerfiles instalan `notebooklm-py[browser,headless]`. **Los dos extras en
+  la misma orden**: el extra `headless` es el que trae `gpsoauth`, y una
+  reinstalación con solo `headless` deja sin `playwright`. Si algún día se
+  reconstruye la imagen, esto ya va dentro; en los contenedores de ahora
+  `gpsoauth` se añadió en caliente con
+  `uv pip install --python /opt/uv/tools/notebooklm-py/bin/python gpsoauth`.
+- El master token es una credencial duradera de la cuenta de Google. Tiene
+  permisos 600 y no sale de `home/`.
 
 ## Lo que es distinto respecto del portátil
 
