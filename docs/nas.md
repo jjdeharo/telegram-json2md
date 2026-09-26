@@ -22,6 +22,18 @@ cambia es dónde está y quién lo dispara.
 Nada importante vive dentro de la imagen: reconstruirla no toca ni los datos ni
 las sesiones. Lo que hay que respaldar es `repo/` y `home/`.
 
+## El modelo de Claude
+
+El modelo está fijado en `home/.claude/settings.json` (`"model": "claude-sonnet-5"`),
+con el identificador completo, para que una actualización de Claude Code no lo
+cambie sin que nadie lo decida. El porqué está en el
+[ADR 0001](adr/0001-modelo-de-claude-fijo.md).
+
+Claude Code va dentro de la imagen y no se actualiza solo. Si un modelo nuevo
+responde «does not support this model», se actualiza con
+`docker exec memoria-telegram sh -c "HOME=/opt/claude claude update"` o reconstruyendo la
+imagen. Lo primero se pierde si el contenedor se recrea sin reconstruir.
+
 ## Cómo se opera
 
 ```bash
