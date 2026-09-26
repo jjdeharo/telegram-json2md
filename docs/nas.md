@@ -29,10 +29,11 @@ con el identificador completo, para que una actualización de Claude Code no lo
 cambie sin que nadie lo decida. El porqué está en el
 [ADR 0001](adr/0001-modelo-de-claude-fijo.md).
 
-Claude Code va dentro de la imagen y no se actualiza solo. Si un modelo nuevo
-responde «does not support this model», se actualiza con
-`docker exec memoria-telegram sh -c "HOME=/opt/claude claude update"` o reconstruyendo la
-imagen. Lo primero se pierde si el contenedor se recrea sin reconstruir.
+Claude Code no se actualiza solo, así que su versión está fijada en
+`nas/Dockerfile` (`ARG CLAUDE_CODE_VERSION`). Si un modelo nuevo responde «does
+not support this model», se sube ese valor y se reconstruye la imagen. Un
+`claude update` dentro del contenedor lo arregla al momento, pero se pierde en
+cuanto el contenedor se recrea.
 
 ## Cómo se opera
 

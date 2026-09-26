@@ -25,12 +25,13 @@ Lo que hace Claude aquí es rutinario: decidir si una fuente entra en el cuadern
 - Un modelo nuevo puede exigir una versión reciente de Claude Code. La 2.1.263,
   la que traía la imagen, rechazaba Opus 5.5 con «version 2.1.280 or newer is
   required»; se actualizaron los tres contenedores de agentes a la 2.1.283.
-- Claude Code está instalado dentro de la imagen y no se actualiza solo. Se
-  actualiza con `docker exec memoria-telegram sh -c "HOME=/opt/claude claude update"` o
-  reconstruyendo la imagen, que instala la última versión. Lo primero vive en el
-  contenedor: si se recrea sin reconstruir, vuelve a la versión de la imagen.
+- Claude Code no se actualiza solo dentro del contenedor, así que su versión
+  también queda fijada, en `nas/Dockerfile` (`ARG CLAUDE_CODE_VERSION`). Para
+  subirla se cambia ese valor y se reconstruye la imagen. Un
+  `docker exec memoria-telegram sh -c "HOME=/opt/claude claude update"` sirve como arreglo
+  inmediato, pero se pierde en cuanto el contenedor se recrea.
 
 ## Validación
 
 El 26/09/2026 se lanzó `claude -p --output-format json` con un encargo mínimo
-dentro del contenedor, y `modelUsage` devolvió solo `claude-sonnet-5`.
+dentro del contenedor, ya reconstruido con Claude Code 2.1.283 en la imagen, y `modelUsage` devolvió solo `claude-sonnet-5`.

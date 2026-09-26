@@ -34,9 +34,13 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
 
 # Claude Code, que es quien repara la pasada cuando falla y quien decide qué
 # hacer con la documentación nueva de eXeLearning. El instalador nativo no
-# necesita Node; se le da un home propio para que pueda actualizarse solo.
+# necesita Node; se instala en un home propio, /opt/claude.
+# La versión se fija aquí porque Claude Code no se actualiza solo dentro del
+# contenedor y un modelo nuevo puede exigir una versión mínima. Para subirla,
+# se cambia este valor y se reconstruye: ver docs/adr/0001-modelo-de-claude-fijo.md.
+ARG CLAUDE_CODE_VERSION=2.1.283
 RUN mkdir -p /opt/claude \
- && curl -fsSL https://claude.ai/install.sh | HOME=/opt/claude bash \
+ && curl -fsSL https://claude.ai/install.sh | HOME=/opt/claude bash -s "$CLAUDE_CODE_VERSION" \
  && ln -s /opt/claude/.local/bin/claude /usr/local/bin/claude \
  && chown -R 1000:1000 /opt/claude
 
