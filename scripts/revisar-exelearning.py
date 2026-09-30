@@ -85,7 +85,7 @@ def expandir(repo: Path, patrones) -> set[str]:
 #   se retoca por fuera.
 # - `solo_vive` marca lo que únicamente se comprueba que siga en pie: una entrada
 #   de blog cambia sola —comentarios, plantilla— y compararla daría un aviso cada
-#   semana; el wiki de HackeXe lo edita Juanjo, que ya sabe cuándo lo toca.
+#   semana.
 # - `pagina` es dónde mirar si hay una edición nueva, para el informe.
 MATERIAL_EXTERNO = {
     "guia-rea-exelearning-2026.md": {
@@ -113,12 +113,6 @@ MATERIAL_EXTERNO = {
         "desde": "junio de 2020",
         "vigilar": "https://cedec.intef.es/12-recomendaciones-para-elaborar-"
                    "materiales-accesibles-e-inclusivos/",
-        "solo_vive": True,
-    },
-    "HackeXe4 - Hoja 1": {
-        "que_es": "Hoja de HackeXe 4, de Juanjo",
-        "desde": "sin edición datada",
-        "vigilar": "https://hackexe.tiddlyhost.com/",
         "solo_vive": True,
     },
 }

@@ -189,9 +189,11 @@ a mano, no la lista de fuentes.
 2. **Al sustituir una fuente: subir la nueva, esperar a que se indexe, borrar la
    vieja.** Nunca al revés. Ya lo hace `scripts/notebook.py`; úsalo.
 3. **No toques lo que el script no gestiona**: los PDF pedagógicos
-   (`guia_rea_exe.pdf`, requisitos de calidad de las SdA) y la hoja de HackeXe
-   (`HackeXe4 - Hoja 1`) los puso Juanjo a mano y se quedan. El
-   `hackexe4-README.md` es otra fuente distinta y esa sí la lleva el script.
+   (requisitos de calidad de las SdA) los puso Juanjo a mano y se quedan. De
+   HackeXe4 el script lleva dos fuentes: `hackexe4-README.md` y
+   `hackexe4-recursos.md`, el catálogo generado de `HackeXe4.json`. La hoja
+   `HackeXe4 - Hoja 1`, que se subió a mano, se retiró el 30-09-2026 con el
+   visto bueno de Juanjo porque había dejado de actualizarse.
 4. **Las conversaciones del grupo son otra cosa**: las lleva la skill
    `memoria-telegram`. No las toques desde aquí.
 

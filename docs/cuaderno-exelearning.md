@@ -96,7 +96,7 @@ Por eso se sincronizan también, cada uno con sus documentos elegidos en
 | `visor-webzip-` | Visor Web-ZIP | Lo mismo, con fechas de apertura y cierre |
 | `edex-` | Editor de estilos EdEX | Estilos propios, y convertir los de la 2.x |
 | `execonvert-` | eXeConvert | Convertir entre `.elp`, `.elpx`, `.docx`, `.md` y `.pdf` |
-| `hackexe4-` | HackeXe4 | Ampliar los iDevices pegando HTML, CSS o JS |
+| `hackexe4-` | HackeXe4 | Ampliar los iDevices pegando HTML, CSS o JS, y buscar utilidades y plugins. `hackexe4-recursos.md` es el catálogo entero, generado de `HackeXe4.json` |
 
 Las rutas están en `repos_complementarios`, en `config.json`; el que no esté
 configurado o no esté en el disco se salta con un aviso, sin romper la pasada.
@@ -126,8 +126,8 @@ falta actualizarlo a mano. La ruta está en `config.json`, en `repo_exelearning`
 - **Está y no ha cambiado** → no lo toca.
 - **Está, lo gestiona este script y ya no está en el repositorio** → lo retira.
 
-El material subido a mano —los requisitos de calidad de las SdA y la hoja de
-HackeXe— no lo gestiona el script: se queda como esté. Eso no significa que nadie
+El material subido a mano —los requisitos de calidad de las SdA— no lo gestiona
+el script: se queda como esté. Eso no significa que nadie
 lo mire. La revisión periódica comprueba, para cada uno, que siga en el cuaderno y
 que su original no se haya reeditado, y lo dice en su informe: la tabla está en
 `MATERIAL_EXTERNO`, dentro de `scripts/revisar-exelearning.py`.
@@ -239,7 +239,7 @@ python3 scripts/decidir-exelearning.py --probar      # qué decidiría, sin toca
 ### Qué sigue sin decidir sola
 
 Cambiar el propósito del cuaderno, tocar las fuentes que Juanjo puso a mano (los
-PDF pedagógicos, la hoja de HackeXe) y cambiar la dirección del manual oficial si
+PDF pedagógicos) y cambiar la dirección del manual oficial si
 CEDEC publica una carpeta nueva. Eso se avisa, no se hace.
 
 ## El manual de usuario

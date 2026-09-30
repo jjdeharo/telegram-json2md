@@ -19,6 +19,7 @@ import argparse
 import fnmatch
 import hashlib
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -118,6 +119,63 @@ COMPLEMENTARIOS = {
     "visor-webzip": ["README.md"],
 }
 
+# HackeXe4 es un catálogo: lo que sirve al cuaderno no es su README, sino los
+# recursos, con su código. Están en `HackeXe4.json`, el único archivo de datos
+# de la aplicación, y se suben convertidos a Markdown, uno por sección, con el
+# enlace a su ficha para que Karla pueda remitir a ella. Sustituye a la hoja de
+# cálculo que se subió a mano y que dejó de actualizarse en mayo de 2026.
+HACKEXE_JSON = "HackeXe4.json"
+HACKEXE_TITULO = "hackexe4-recursos.md"
+HACKEXE_FICHA = "https://hackexe4.github.io/#script="
+
+
+def valla(codigo: str) -> str:
+    """Una valla más larga que cualquier secuencia de acentos graves del código."""
+    tramos = re.findall(r"`+", codigo)
+    return "`" * max(3, max((len(t) for t in tramos), default=0) + 1)
+
+
+def catalogo_hackexe(repo: Path) -> str | None:
+    """El catálogo de HackeXe4 en Markdown, o None si el JSON no está."""
+    ruta = repo / HACKEXE_JSON
+    if not ruta.is_file():
+        registrar(f"  aviso: no existe hackexe4:{HACKEXE_JSON}")
+        return None
+    recursos = json.loads(ruta.read_text(encoding="utf-8"))
+    lineas = [
+        "# HackeXe4: recursos para ampliar eXeLearning",
+        "",
+        "Catálogo completo de https://hackexe4.github.io/, generado a partir de su",
+        "archivo de datos. Hay dos clases de recursos: fragmentos de HTML, CSS o",
+        "JavaScript para pegar en eXeLearning (llevan «Dónde insertar» y «Código»),",
+        "y fichas de programas, plataformas y documentación relacionados.",
+        "Al recomendar un recurso, enlaza su ficha.",
+        "",
+    ]
+    for r in recursos:
+        descripcion = r.get("descripcion", "").strip()
+        # La descripción repite el título como encabezado: sobra aquí.
+        descripcion = re.sub(r"^#+ .*\n+", "", descripcion)
+        # Sus encabezados bajan un nivel para quedar dentro de la sección.
+        descripcion = re.sub(r"(?m)^(#+) ", lambda m: "#" * max(len(m.group(1)), 3) + " ",
+                             descripcion)
+        lineas += [f"## {r['titulo']} ({r['id']})", "",
+                   f"- Ficha: {HACKEXE_FICHA}{r['id']}"]
+        if r.get("categorias"):
+            lineas.append(f"- Categorías: {', '.join(r['categorias'])}")
+        if r.get("donde"):
+            lineas.append(f"- Dónde insertar: {', '.join(r['donde'])}")
+        if r.get("etiquetas"):
+            lineas.append(f"- Etiquetas: {', '.join(r['etiquetas'])}")
+        if r.get("fuente"):
+            lineas.append(f"- Fuente: {r['fuente']}")
+        lineas += ["", r.get("resumen", "").strip(), "", descripcion, ""]
+        if r.get("script", "").strip():
+            v = valla(r["script"])
+            lineas += ["### Código", "", f"{v}html", r["script"].strip(), v, ""]
+    return "\n".join(lineas).rstrip() + "\n"
+
+
 # Las decisiones de arquitectura explican por qué el programa hace lo que hace,
 # pero son veinte archivos cortos: como fuentes sueltas se pisan entre ellas, así
 # que van en un único documento.
@@ -166,7 +224,7 @@ DESDE_DESARROLLO = {"public/CHANGELOG.md"}
 # Fuentes de la etapa manual que hay que retirar. Todo se sube ahora en Markdown,
 # así que cualquier .docx del proyecto es una versión superada: se reconocen por
 # la forma del título en vez de enumerarlos, para que no haga falta tocar esta
-# lista cada vez. Los PDF pedagógicos y la hoja de HackeXe no se tocan.
+# lista cada vez. Los PDF pedagógicos no se tocan.
 LEGADO_EXPLICITO = {
     "styles.docx",
     "tinymce-editor-compatibility.docx",
@@ -177,6 +235,10 @@ LEGADO_EXPLICITO = {
     # que se pierde con ella son las «12 recomendaciones» de accesibilidad, que
     # la nueva no trae y que por eso se conservan aparte, en `fuentes/`.
     "guia_rea_exe.pdf",
+    # La hoja de HackeXe4 se subió a mano desde Google Sheets y dejó de
+    # actualizarse cuando la aplicación pasó sus datos a HackeXe4.json, en mayo
+    # de 2026. La sustituye `hackexe4-recursos.md`, generado de ese JSON.
+    "HackeXe4 - Hoja 1",
 }
 
 
@@ -312,6 +374,10 @@ def reunir_documentos(repo: Path, extras: dict[str, Path]) -> dict[str, str]:
 
     for prefijo, ruta_repo in extras.items():
         documentos.update(recoger(ruta_repo, COMPLEMENTARIOS[prefijo], prefijo))
+        if prefijo == "hackexe4":
+            catalogo = catalogo_hackexe(ruta_repo)
+            if catalogo:
+                documentos[HACKEXE_TITULO] = catalogo
 
     for titulo, (patron, encabezado, nota) in CONSOLIDAR.items():
         partes = [f"# {encabezado}\n",
@@ -391,8 +457,9 @@ def escribir_indice(documentos: dict[str, str], repo: Path) -> tuple[str, str]:
         "- **Estilos propios**: `doc-development-styles` y `edex-README`, el editor.",
         "- **Convertir entre formatos** (.elp, .elpx, .docx, .md, .pdf):",
         "  `execonvert-README`.",
-        "- **Ampliar lo que hacen los iDevices** pegando HTML, CSS o JS:",
-        "  `hackexe4-README` y la hoja de HackeXe.",
+        "- **Ampliar lo que hacen los iDevices** pegando HTML, CSS o JS, o buscar",
+        "  una utilidad o un plugin para eXeLearning: `hackexe4-recursos`, el",
+        "  catálogo de HackeXe4 con el código y el enlace a la ficha de cada recurso.",
         "- **Currículo, competencias y DUA**: el iDevice de fundamentación curricular,",
         "  en `exelearning-public-files-perm-idevices-base-lomloe-README`.",
         "- **Comportamientos raros pero intencionados**: `KNOWN_ISSUES`,",
