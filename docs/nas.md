@@ -24,7 +24,7 @@ las sesiones. Lo que hay que respaldar es `repo/` y `home/`.
 
 ## El modelo de Claude
 
-El modelo está fijado en `home/.claude/settings.json` (`"model": "claude-sonnet-5"`),
+El modelo está fijado en `home/.claude/settings.json` (`"model": "claude-sonnet-5-5"`; Sonnet 5 hasta el 05/10/2026),
 con el identificador completo, para que una actualización de Claude Code no lo
 cambie sin que nadie lo decida. El porqué está en el
 [ADR 0001](adr/0001-modelo-de-claude-fijo.md).

@@ -45,3 +45,11 @@ al día con comprobación y vuelta atrás (ADR 0003 de vigilancia-nas).
 `nas/Dockerfile` conserva un valor por si falta. Ese día se subió a la 2.1.289
 y se comprobó con una consulta mínima. El actualizador también pone al día
 Telethon (1.44.0 → 1.45.0 ese día); el CLI de NotebookLM lo sigue actualizando `scripts/actualizar-cli.py`.
+
+## Cambio del 05/10/2026: Sonnet 5.5
+
+A petición de Juanjo, el modelo pasa a `claude-sonnet-5-5` en
+`home/.claude/settings.json` (copia del anterior en
+`settings.json.bak-20261005`). Comprobado ese día con `claude -p
+--output-format json` dentro del contenedor: `modelUsage` devolvió solo
+`claude-sonnet-5-5`.
