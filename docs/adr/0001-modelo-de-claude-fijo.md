@@ -35,3 +35,13 @@ Lo que hace Claude aquí es rutinario: decidir si una fuente entra en el cuadern
 
 El 26/09/2026 se lanzó `claude -p --output-format json` con un encargo mínimo
 dentro del contenedor, ya reconstruido con Claude Code 2.1.283 en la imagen, y `modelUsage` devolvió solo `claude-sonnet-5`.
+
+## Actualización del 05/10/2026
+
+La versión de Claude Code ya no se sube a mano en `nas/Dockerfile`: la fija el
+archivo común `/volume1/docker/versiones/versiones.env` (enlazado como `.env`
+en la carpeta del NAS), que el actualizador semanal de vigilancia-nas mantiene
+al día con comprobación y vuelta atrás (ADR 0003 de vigilancia-nas).
+`nas/Dockerfile` conserva un valor por si falta. Ese día se subió a la 2.1.289
+y se comprobó con una consulta mínima. El actualizador también pone al día
+Telethon (1.44.0 → 1.45.0 ese día); el CLI de NotebookLM lo sigue actualizando `scripts/actualizar-cli.py`.

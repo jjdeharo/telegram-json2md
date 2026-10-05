@@ -9,7 +9,14 @@
 # en los volúmenes de abajo, en /volume1/docker/memoria-telegram.
 services:
   memoria-telegram:
-    build: .
+    # La versión de Claude Code sale del archivo común del NAS
+    # (/volume1/docker/versiones/versiones.env, enlazado aquí como .env), que el
+    # actualizador semanal de vigilancia mantiene al día. Si falta, se usa la
+    # que trae el Dockerfile.
+    build:
+      context: .
+      args:
+        CLAUDE_CODE_VERSION: ${CLAUDE_CODE_VERSION:-}
     image: memoria-telegram:local
     container_name: memoria-telegram
     restart: unless-stopped

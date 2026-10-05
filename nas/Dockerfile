@@ -38,9 +38,9 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
 # La versión se fija aquí porque Claude Code no se actualiza solo dentro del
 # contenedor y un modelo nuevo puede exigir una versión mínima. Para subirla,
 # se cambia este valor y se reconstruye: ver docs/adr/0001-modelo-de-claude-fijo.md.
-ARG CLAUDE_CODE_VERSION=2.1.283
+ARG CLAUDE_CODE_VERSION=2.1.289
 RUN mkdir -p /opt/claude \
- && curl -fsSL https://claude.ai/install.sh | HOME=/opt/claude bash -s "$CLAUDE_CODE_VERSION" \
+ && curl -fsSL https://claude.ai/install.sh | HOME=/opt/claude bash -s "${CLAUDE_CODE_VERSION:-2.1.289}" \
  && ln -s /opt/claude/.local/bin/claude /usr/local/bin/claude \
  && chown -R 1000:1000 /opt/claude
 
