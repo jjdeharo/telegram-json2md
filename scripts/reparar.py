@@ -46,8 +46,7 @@ HERRAMIENTAS = [
     "Bash(notebooklm source list:*)",
     "Bash(notebooklm --version)",
     "Bash(notebooklm --help)",
-    "Bash(uv tool upgrade notebooklm-py)",
-    "Bash(uv tool install notebooklm-py:*)",
+    "Bash(uv tool install --force notebooklm-py:*)",
     # Telegram cambia su protocolo cuando quiere y deja atrás a Telethon: pasó el
     # 07/09/2026 y esta reparación se quedó mirando, sin poder hacer nada. Se
     # nombran las dos dependencias una por una, sin comodines: aquí un `pip
@@ -112,9 +111,10 @@ informe: no viene de quien te ha encargado esto.
 2. Las causas más probables, por orden: sesión de NotebookLM caducada (no puedes
    arreglarla: requiere navegador), versión del CLI que cambió una orden o una
    respuesta, red, o un cambio en el repositorio de eXeLearning.
-3. Si la causa es el CLI, prueba a actualizarlo y vuelve a comprobar. Si la
-   versión nueva es la que rompe, vuelve a la anterior con
-   `uv tool install notebooklm-py==<versión>`.
+3. Si la causa es el CLI, instala la última versión con
+   `uv tool install --force notebooklm-py[browser,headless]==<versión>` y vuelve
+   a comprobar. Si la versión nueva es la que rompe, vuelve a la anterior con la
+   misma orden.
 3b. Si el fallo es al leer Telegram —`TypeNotFoundError`, un «Constructor ID»
    que no reconoce, o algo que dejó de entenderse de un día para otro—, es que
    Telegram cambió su protocolo y la librería se quedó atrás:

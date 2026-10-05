@@ -30,6 +30,7 @@ sys.path.insert(0, str(BASE / "scripts"))
 from informar import informar  # noqa: E402
 
 PAQUETE = "notebooklm-py"
+EXTRAS = "[browser,headless]"   # los mismos que instala nas/Dockerfile
 
 
 def instalada() -> str:
@@ -85,7 +86,10 @@ def main() -> int:
     if args.solo_ver:
         return 0
 
-    subprocess.run(["uv", "tool", "upgrade", PAQUETE], capture_output=True, timeout=900)
+    # La versión exacta, con los extras de la imagen. No `uv tool upgrade`: respeta
+    # la versión fijada en una vuelta atrás y, desde entonces, ya no subiría.
+    subprocess.run(["uv", "tool", "install", "--force", f"{PAQUETE}{EXTRAS}=={alli}"],
+                   capture_output=True, timeout=900)
     ahora = instalada()
     if ahora != alli:
         informar(f"⚠️ No he podido actualizar el CLI de NotebookLM a la {alli}; "
@@ -107,7 +111,8 @@ def main() -> int:
     # La versión nueva rompe algo: se vuelve atrás sin pensarlo. Perder una
     # versión no cuesta nada; perder el archivado de varios días, sí.
     print(f"la {alli} rompe algo ({queja}); volviendo a la {aqui}")
-    subprocess.run(["uv", "tool", "install", f"{PAQUETE}=={aqui}"], capture_output=True, timeout=900)
+    subprocess.run(["uv", "tool", "install", "--force", f"{PAQUETE}{EXTRAS}=={aqui}"],
+                   capture_output=True, timeout=900)
     subprocess.run(["notebooklm", "skill", "install"], capture_output=True, timeout=300)
     recuperado, _ = funciona()
 

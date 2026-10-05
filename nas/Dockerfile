@@ -22,8 +22,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN useradd -u 1000 -m -s /bin/bash jjdeharo
 
 # uv, fuera del home: el home es un volumen y la imagen tiene que traer sus
-# herramientas puestas. UV_TOOL_DIR va en el entorno para que el
-# `uv tool upgrade` de actualizar-cli.py encuentre lo mismo que se instaló aquí.
+# herramientas puestas. UV_TOOL_DIR va en el entorno para que
+# actualizar-cli.py encuentre lo mismo que se instaló aquí. Al reconstruir la
+# imagen, el CLI vuelve a la versión de esta capa; la pasada diaria lo sube.
 ENV UV_TOOL_DIR=/opt/uv/tools \
     UV_TOOL_BIN_DIR=/usr/local/bin \
     UV_INSTALL_DIR=/usr/local/bin \
