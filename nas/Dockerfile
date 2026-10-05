@@ -25,12 +25,17 @@ RUN useradd -u 1000 -m -s /bin/bash jjdeharo
 # herramientas puestas. UV_TOOL_DIR va en el entorno para que
 # actualizar-cli.py encuentre lo mismo que se instaló aquí. Al reconstruir la
 # imagen, el CLI vuelve a la versión de esta capa; la pasada diaria lo sube.
+# El enlace del CLI que crea uv va en /opt/uv/bin, del usuario, para que
+# actualizar-cli.py pueda reinstalarlo sin root (en /usr/local/bin, de root, uv
+# fallaba al enlazar y no escribía su registro). /usr/local/bin/notebooklm es un
+# enlace fijo a ese, para los scripts que fijan su propio PATH.
 ENV UV_TOOL_DIR=/opt/uv/tools \
-    UV_TOOL_BIN_DIR=/usr/local/bin \
+    UV_TOOL_BIN_DIR=/opt/uv/bin \
     UV_INSTALL_DIR=/usr/local/bin \
     PATH=/usr/local/bin:/usr/bin:/bin
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
  && uv tool install "notebooklm-py[browser,headless]" \
+ && ln -s /opt/uv/bin/notebooklm /usr/local/bin/notebooklm \
  && chown -R 1000:1000 /opt/uv
 
 # Claude Code, que es quien repara la pasada cuando falla y quien decide qué
