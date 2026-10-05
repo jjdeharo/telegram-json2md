@@ -59,6 +59,36 @@ python3 scripts/actualizar.py --sin-subir         # generar sin tocar NotebookLM
 Es idempotente: repetirlo no duplica nada. Tarda uno o dos minutos. Nunca
 procesa el día en curso, solo días terminados.
 
+## Enlace directo a un mensaje
+
+Cuando se cite o se agradezca algo dicho en uno de los grupos, el enlace va al
+mensaje exacto, no al grupo, y lo busca el agente sin pedírselo a Juanjo
+(25-09-2026). Los datos crudos están en `datos/<prefijo>-<AAAA-MM>.json` (los
+meses de más de tres meses, en `.json.gz`). Cada mensaje tiene `id` y
+`reply_to_message_id`. Los grupos tienen temas: el tema es el mensaje de
+servicio (`type: "service"`) en el que acaba la cadena de respuestas. El enlace
+es `https://t.me/<grupo>/<tema>/<id>`; si la cadena no llega a ningún mensaje
+de servicio, el mensaje está en el tema general y basta con
+`https://t.me/<grupo>/<id>`.
+
+```bash
+ssh jjdeharo@192.168.1.113 'cd /volume1/docker/memoria-telegram/repo && python3 - <<EOF
+import json
+d = json.load(open("datos/vceduca-2026-09.json"))
+por_id = {m["id"]: m for m in d["messages"]}
+for m in d["messages"]:
+    if "abrumadora" in str(m.get("text")):
+        r = m
+        while r.get("reply_to_message_id") in por_id and r["type"] != "service":
+            r = por_id[r["reply_to_message_id"]]
+        tema = r["id"] if r["type"] == "service" else None
+        i = m["id"]
+        print(m["from"], "https://t.me/vceduca/%s/%s" % (tema, i) if tema else "https://t.me/vceduca/%s" % i)
+EOF'
+```
+
+El día en curso todavía no está en `datos/`: el archivo llega hasta ayer.
+
 ## El cuaderno de eXeLearning lleva algo más
 
 Ese cuaderno no solo tiene conversaciones: lleva el manual de usuario y la
