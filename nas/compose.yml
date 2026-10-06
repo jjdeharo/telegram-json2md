@@ -24,6 +24,15 @@ services:
     environment:
       TZ: Europe/Madrid
       HOME: /home/jjdeharo
+    # El acceso a Claude: el token de un año (claude setup-token), el mismo para
+    # los cuatro contenedores con agente y guardado en un solo sitio, el de
+    # meteo-local. Sustituye al inicio de sesión normal, que caduca a los 30
+    # días aunque se use a diario (pasó el 06/10/2026). Caduca el 05/10/2027:
+    # el vigía avisa antes. Para renovarlo, `claude setup-token` en el portátil
+    # y cambiar ese único archivo.
+    env_file:
+      - path: ../meteo-local/home/.config/meteo-local/claude.env
+        required: false
     volumes:
       # El repositorio, con sus datos dentro (datos/, salida/, sesion/,
       # registro/, material/, config.json y estado.json). Es lo que se copia del
@@ -33,6 +42,6 @@ services:
       # lee con `git show`. Se clonan una vez y se actualizan solos.
       - ./repos:/repos
       # El home persistente: aquí viven las cookies de NotebookLM (~/.notebooklm)
-      # y la sesión de Claude (~/.claude). Sin esto habría que volver a
+      # y la configuración de Claude (~/.claude). Sin esto habría que volver a
       # autorizar en cada reconstrucción de la imagen.
       - ./home:/home/jjdeharo

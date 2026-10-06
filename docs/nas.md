@@ -78,7 +78,7 @@ navegador en el NAS. Se copiaron del portátil una vez y viven en `home/`.
 |---|---|---|
 | Telegram | `repo/sesion/telegram.session` | Es la misma sesión, no una nueva: Telegram no pide código. Si algún día se revoca, hay que autorizarla a mano con `docker exec -it` y el código del móvil. |
 | NotebookLM | `home/.notebooklm/` | Lo primero, `docker exec memoria-telegram notebooklm auth refresh`: desde el master token lo rehace sin navegador y sin salir del NAS (ver abajo). Si eso fallara, se entra en el portátil y se copia `profiles/default/storage_state.json` a `/volume1/docker/memoria-telegram/home/.notebooklm/profiles/default/`. **Con eso valen los dos contenedores**: el del boletín tiene esa misma carpeta montada, no una copia. |
-| Claude | `home/.claude/.credentials.json` y `home/.claude.json` | Copiar de nuevo desde el portátil, o `claude setup-token`. |
+| Claude | El token de un año, común a los cuatro contenedores con agente: `/volume1/docker/meteo-local/home/.config/meteo-local/claude.env`, que el `compose.yml` carga con `env_file` (desde el 06/10/2026; antes, un inicio de sesión que caducaba a los 30 días) | `nas/renovar-token.sh`, en el repositorio `vigilancia-nas`. El vigía avisa tres semanas antes de que caduque. |
 | El bot de avisos | `home/.config/avisar-juanjo/config.json` | Copiar de nuevo desde el portátil. |
 
 El día que el trabajo diario empiece a fallar con «la sesión de NotebookLM ha
