@@ -1,7 +1,8 @@
 # Memoria de Telegram, para que la pasada diaria no dependa del portátil.
 #
 # Todo lo que el automatismo necesita va aquí dentro: git, el entorno de Python,
-# el CLI de NotebookLM y Claude. Lo que queda fuera —el repositorio, los datos,
+# pandoc (para el manual de eXeLearning, añadido el 27-10-2026: sin él no se
+# podía rehacer en el NAS), el CLI de NotebookLM y Claude. Lo que queda fuera —el repositorio, los datos,
 # las sesiones— se monta desde /volume1/docker/memoria-telegram, de modo que
 # reconstruir la imagen no toca nada de lo que importa.
 FROM debian:12-slim
@@ -13,7 +14,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates curl git tzdata tini procps less ripgrep \
-      python3 python3-venv \
+      python3 python3-venv pandoc \
  && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
  && rm -rf /var/lib/apt/lists/*
 
