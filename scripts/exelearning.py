@@ -45,7 +45,23 @@ AVISAR = BASE / "scripts" / "avisar.sh"
 # desarrollo) se queda fuera: no puede responder a nadie y compite con lo útil
 # a la hora de recuperar fragmentos.
 # Decisiones automáticas del 03/09/2026:
+# Decisiones automáticas del 20/10/2026:
 INCLUIR = [
+    "doc/plugins/wordpress.md",  # Versión en inglés de la guía de instalación y uso del plugin de WordPress.
+    "doc/plugins/wordpress.es.md",  # Describe los requisitos, la instalación y el uso del plugin de WordPress, incluidas la edición y la publicación de recursos.
+    "doc/plugins/onedrive.md",  # Versión en inglés de la guía del plugin de OneDrive: consentimiento, uso y autoalojamiento.
+    "doc/plugins/onedrive.es.md",  # Explica el consentimiento de Microsoft 365, el uso y el autoalojamiento del plugin de OneDrive, que influyen en lo que ve el usuario.
+    "doc/plugins/omeka-s.md",  # Versión en inglés de la guía del módulo de Omeka S.
+    "doc/plugins/omeka-s.es.md",  # Describe los requisitos, la instalación, la configuración y el uso del módulo de Omeka S.
+    "doc/plugins/nextcloud.md",  # Versión en inglés de la guía de instalación y uso del plugin de Nextcloud.
+    "doc/plugins/nextcloud.es.md",  # Explica los requisitos, la instalación y el reconocimiento de archivos .elpx en Nextcloud, útil para diagnosticar problemas.
+    "doc/plugins/moodle.md",  # Versión en inglés de la guía de los plugins de Moodle: requisitos, instalación y calificaciones.
+    "doc/plugins/moodle.es.md",  # Describe los tres plugins de Moodle, sus requisitos, su instalación y cómo califican, es decir, comportamientos que ve el usuario.
+    "doc/plugins/manual.es.md",  # Presenta el manual de instalación y uso de los plugins de integración, dirigido a administración y profesorado.
+    "doc/plugins/index.md",  # Versión en inglés del resumen de plugins por plataforma.
+    "doc/plugins/index.es.md",  # Resume qué plugin de integración corresponde a cada plataforma y cómo califica cada uno, información útil para el usuario.
+    "doc/plugins/google-drive.md",  # Versión en inglés de la guía del plugin de Google Drive: instalación, permisos y uso.
+    "doc/plugins/google-drive.es.md",  # Explica la instalación, los permisos y el uso del plugin de Google Drive, que el profesorado y la administración pueden necesitar para diagnosticar problemas.
     "README.md",
     "KNOWN_ISSUES.md",
     "UPGRADE.md",
