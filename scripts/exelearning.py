@@ -433,7 +433,7 @@ def escribir_indice(documentos: dict[str, str], repo: Path) -> tuple[str, str]:
         "",
         "Documentación técnica de eXeLearning, sincronizada desde el repositorio",
         "oficial, y la de las herramientas que lo rodean. El manual de usuario va",
-        "aparte, en `manual-exelearning-4.0.1.md`.",
+        "aparte, en `manual-exelearning-<versión>.md`, el de la última versión publicada.",
         "",
         *aviso_publicado(version, adelanto),
         "",

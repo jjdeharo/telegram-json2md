@@ -95,13 +95,15 @@ instrucciones dirigidas a quien desarrolla el proyecto y volvió a entrar.
    existe, es que el archivo se renombró o se borró. Apunta a la ruta nueva o
    quita la entrada.
 
-4. **Manual nuevo**: si el informe avisa de que la portada ha cambiado, o si en
-   https://descargas.intef.es/cedec/exe_learning/Manuales/ hay una carpeta más
-   reciente que la de `RAIZ` en `scripts/manual_exelearning.py`, actualiza esa
-   dirección y rehaz el manual:
+4. **Manual nuevo**: lo detecta solo. El generador prueba las carpetas del
+   INTEF (`manual_exe405/`…) de las versiones publicadas de eXeLearning, de la
+   más nueva a la más antigua; cuando aparece una nueva, la revisión diaria ve
+   cambiada la portada y la pasada siguiente lo rehace y retira el anterior del
+   cuaderno. Para comprobarlo o hacerlo a mano:
 
    ```bash
-   python3 scripts/manual_exelearning.py
+   python3 scripts/manual_exelearning.py --ultima   # cuál es el más reciente
+   python3 scripts/manual_exelearning.py            # rehacerlo
    ```
 
 5. **Sincroniza y comprueba**:
@@ -150,7 +152,7 @@ Dos cosas que buscar, y en este orden:
    Moodle 46, plataformas educativas 43, eXeViewer 39, utilidades 31.
 
 Antes de dar por buena una laguna, compruébala contra las fuentes que ya hay
-(`grep -ci` en `material/exelearning/manual-exelearning-4.0.1.md` y compañía). La
+(`grep -ci` en `material/exelearning/manual-exelearning-*.md` y compañía). La
 mitad de las veces la respuesta sí está y el problema es otro.
 
 ### Cuando la laguna no la cubre ningún repositorio

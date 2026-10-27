@@ -259,9 +259,8 @@ def main() -> int:
             "python3 scripts/exelearning.py",
             "```",
             "",
-            "Comprueba también en https://descargas.intef.es/cedec/exe_learning/Manuales/",
-            "si hay una carpeta de manual más reciente; si la hay, actualiza `RAIZ` en",
-            "`scripts/manual_exelearning.py`.",
+            "El generador busca solo la versión más reciente del manual",
+            "(`python3 scripts/manual_exelearning.py --ultima` dice cuál es).",
             "",
         ]
 
@@ -296,12 +295,11 @@ def main() -> int:
 
 
 def exelearning_manual_url() -> str:
-    """La dirección del manual, leída del generador para no repetirla aquí."""
-    texto = (BASE / "scripts" / "manual_exelearning.py").read_text(encoding="utf-8")
-    for linea in texto.splitlines():
-        if linea.startswith("RAIZ = "):
-            return linea.split('"')[1]
-    raise RuntimeError("no se encontró RAIZ en manual_exelearning.py")
+    """La dirección del manual más reciente, que busca el propio generador: cuando el INTEF
+    publica uno nuevo, la dirección cambia, la huella de la portada también y se rehace."""
+    r = subprocess.run([sys.executable, str(BASE / "scripts" / "manual_exelearning.py"), "--ultima"],
+                       capture_output=True, text=True, timeout=600, check=True)
+    return r.stdout.split()[-1]
 
 
 if __name__ == "__main__":

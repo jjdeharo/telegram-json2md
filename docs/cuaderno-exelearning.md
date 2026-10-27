@@ -249,14 +249,25 @@ junta en un único Markdown de unas 49.000 palabras, con la jerarquía de títul
 recompuesta —cada página vuelve a empezar en `#`, y sin recolocarlas NotebookLM
 trocea mal— y los enlaces e imágenes absolutizados.
 
-Se rehace solo cuando sale un manual nuevo, no a diario:
+Se rehace solo cuando sale un manual nuevo, no a diario, y la versión se busca
+sola (desde el 27-10-2026; antes la dirección estaba fija y se quedó en la 4.0.1
+cuando ya había manual de la 4.0.5). Cada versión vive en su carpeta del INTEF
+(`manual_exe401/`, `manual_exe405/`…), el servidor no deja listarlas y una
+carpeta que no existe redirige al portal del INTEF. El generador prueba las
+versiones publicadas de eXeLearning, según las etiquetas de su repositorio, de
+la más nueva a la más antigua, y usa la primera que responde. La revisión
+diaria guarda la huella de esa portada: si cambia la dirección o el contenido,
+la pasada siguiente lo rehace. El Markdown lleva la versión en el nombre
+(`manual-exelearning-4.0.5.md`) y sustituye al anterior, que la sincronización
+retira del cuaderno. Si el manual nuevo tiene menos de 20 páginas, se conserva
+el anterior.
 
 ```bash
-python3 scripts/manual_exelearning.py
+python3 scripts/manual_exelearning.py --ultima   # cuál es el más reciente
+python3 scripts/manual_exelearning.py            # rehacerlo
 ```
 
-Si algún día cambia la dirección del manual, está en `RAIZ`, dentro de ese
-script. Queda en `material/exelearning/`, que no se versiona.
+Queda en `material/exelearning/`, que no se versiona.
 
 ## Por qué Markdown y no `.docx` ni PDF
 
