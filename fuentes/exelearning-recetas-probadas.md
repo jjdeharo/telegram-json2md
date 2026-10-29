@@ -95,49 +95,55 @@ regla funciona dentro del estilo.
 
 ---
 
-## Pasar un sitio de Google Sites a eXeLearning
+## Pasar una web a eXeLearning (Google Sites y otras)
 
-eXeLearning no importa un sitio de Google Sites. Se puede llevar su contenido en
-dos pasos: sacar el sitio de Google con Google Takeout y convertir ese ZIP con
-eXeConvert, que lo pasa entero a un proyecto de eXeLearning. **Pasa el
-contenido, pero no el diseño**, y hay que rematarlo a mano. Probado el
-29-10-2026 con un sitio de dos páginas hecho con una plantilla de Google Sites,
-sin publicar.
+eXeLearning no importa webs. eXeConvert (https://execonvert.github.io/), de
+Juan José de Haro, convierte una web guardada en un proyecto de eXeLearning
+(`.elpx`): una página o un sitio entero en un ZIP. **Pasa el contenido, no el
+diseño.** Lo que sigue vale desde la versión 0.7.2 de eXeConvert (29-10-2026).
 
-**1. Sacar el sitio con Google Takeout.** Google Sites no tiene un botón de
-descargar, pero Google Takeout (takeout.google.com) exporta el sitio dentro de los
-datos de Drive. Para no exportar todo Drive:
-- Pon el sitio en una carpeta de «Mi unidad», sola. Según la Universidad de
-  Míchigan, un sitio en una unidad compartida no se puede exportar
-  (https://teamdynamix.umich.edu/TDClient/30/Portal/KB/Article/15738/Google-Download-Site-as-HTML-File);
-  esto no se ha probado.
-- En Takeout, desmarca todo, marca Drive y, en la lista de carpetas de Drive,
-  deja marcada solo esa carpeta.
-- Crea la exportación. Google avisa por correo cuando está lista (en la prueba,
-  en unos minutos) y pide la contraseña de la cuenta al descargar el ZIP.
+**Google Sites.** Google Sites no tiene botón de descarga; se saca con Google
+Takeout (takeout.google.com):
+1. Desmarca todo, marca Drive y, en la lista de carpetas de Drive, deja marcada
+   solo la carpeta donde está el sitio. Takeout no deja elegir archivos sueltos:
+   si el sitio está suelto en «Mi unidad», muévelo antes a una carpeta propia y
+   devuélvelo después.
+2. Crea la exportación. Google avisa por correo cuando está lista y pide la
+   contraseña de la cuenta al descargar el ZIP.
+3. Sube a eXeConvert el ZIP tal como llega, sin abrirlo, y guarda el `.elpx`.
 
-**2. Convertir el ZIP con eXeConvert** (https://execonvert.github.io/), de
-Juan José de Haro. Se sube el ZIP de Takeout tal como llega, sin abrirlo, y se
-guarda como `.elpx`. Hace falta la versión 0.7.0 o posterior (29-10-2026); las
-anteriores convertían una sola página por ZIP.
+Si el sitio está publicado, el ZIP trae el borrador y la versión publicada;
+eXeConvert convierte el borrador, con los cambios que aún no se hayan publicado.
 
-**Qué llega y qué no** (comparando el sitio original con el convertido):
-- Cada página del sitio es una página del proyecto, en el orden del menú de
-  Google Sites, con sus subpáginas debajo y con el nombre que lleva en el menú.
-  El proyecto toma el nombre del sitio.
-- Llegan el texto, los encabezados, las listas y las imágenes que van dentro
-  del contenido. Los encabezados de cada página se convierten en bloques de
-  eXeLearning.
-- Los enlaces entre páginas del sitio siguen funcionando: pasan a ser enlaces
-  internos de eXeLearning. Un enlace a una sección de una página lleva al
-  principio de esa página. Los enlaces a otras webs se mantienen.
-- Las imágenes se guardan como archivos del proyecto, y las de más de 1920 px
-  de lado se reducen a esa medida, que basta para verlas en eXeLearning. En la
-  prueba, el sitio con una foto grande quedó en 2,4 MB (la foto sola pesaba
-  4,7 MB), y eXeLearning 4.0.5 y 4.0.6 lo exportaron como sitio web con sus
-  imágenes y sus enlaces.
-- No llegan el diseño de Google Sites (columnas, tarjetas, la imagen de fondo de
-  la cabecera) ni su menú, que en eXeLearning es el del propio programa. Las
-  secciones desplegables quedan abiertas.
-- Las subpáginas se han probado con un sitio de prueba hecho a mano, no con un
-  Google Sites real con subpáginas.
+**Otras webs.** Funciona con un ZIP de una web estática cuyas páginas se enlazan
+entre sí con rutas relativas, como la que guardan los programas para descargar
+webs (HTTrack, `wget`) o la que crean los generadores de webs (MkDocs, Jekyll…).
+Una página suelta se puede subir como `.html` o en un ZIP con sus imágenes.
+
+**Qué hace eXeConvert:**
+- Cada página de la web es una página del proyecto, en el orden y con la
+  jerarquía del menú de la web, y con el nombre que lleva en el menú.
+- Los encabezados de cada página se convierten en bloques.
+- Los enlaces entre páginas siguen funcionando; los enlaces a otras webs se
+  mantienen.
+- Las imágenes se guardan en el proyecto, y las de más de 1920 px se reducen a
+  esa medida para que el proyecto no pese de más.
+- Deja fuera el menú, la cabecera, el pie y las barras laterales de la web: en
+  eXeLearning el menú es el del propio programa.
+
+**Qué no llega o hay que retocar:**
+- El diseño: columnas, colores, fondos y tarjetas.
+- El tamaño con que se veía cada imagen. Una imagen grande puede verse más
+  grande que en la web original; se ajusta en eXeLearning, en las propiedades
+  de la imagen.
+- Lo que la web genera al mostrarse, como la lista automática de subpáginas de
+  Google Sites, y los archivos de Drive incrustados.
+- Las webs que cargan el contenido con JavaScript llegan vacías.
+- Las páginas enlazadas con la dirección completa de la web
+  (`https://…`) no se siguen: solo entra la principal.
+- Los desplegables del menú que no son una página (un rótulo que agrupa
+  otras) no se conservan: sus páginas quedan a su mismo nivel.
+
+Probado el 29-10-2026 con dos Google Sites, uno de ellos de 27 páginas, y con la
+web de MkDocs descargada con `wget`. eXeLearning 4.0.6 abrió los proyectos y
+los exportó con sus imágenes y sus enlaces.
