@@ -24,8 +24,10 @@ se puede «añadir código personalizado».
 Al exportar como página única, SCORM o ePub no se incluye. Comprobado el
 29-10-2026 exportando el mismo proyecto en los cuatro formatos, y en el código del
 programa: solo el exportador de sitio web lo añade, también en la versión en
-desarrollo de esa fecha. Para los demás formatos, la vía es poner la regla en el
-estilo (ver más abajo).
+desarrollo de esa fecha. Lo mismo pasa con el cuadro **Pie de página**. En la
+3.0.2 sí llegaba a todos los formatos. Está avisado al equipo en la incidencia
+https://github.com/exelearning/exelearning/issues/2667. Para los demás formatos,
+la vía es poner la regla en el estilo (ver más abajo).
 
 Para deshacer cualquier receta, basta con borrar el trozo y volver a exportar.
 
