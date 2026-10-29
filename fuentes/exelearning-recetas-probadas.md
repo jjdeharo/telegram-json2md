@@ -98,10 +98,11 @@ regla funciona dentro del estilo.
 ## Pasar un sitio de Google Sites a eXeLearning
 
 eXeLearning no importa un sitio de Google Sites. Se puede llevar su contenido en
-dos pasos: sacar el sitio de Google como páginas HTML y convertir cada página con
-eXeConvert. **Pasa el contenido, pero no el diseño**, y hay que rematarlo a mano.
-Probado el 29-10-2026 con un sitio de dos páginas hecho con una plantilla de
-Google Sites, sin publicar.
+dos pasos: sacar el sitio de Google con Google Takeout y convertir ese ZIP con
+eXeConvert, que lo pasa entero a un proyecto de eXeLearning. **Pasa el
+contenido, pero no el diseño**, y hay que rematarlo a mano. Probado el
+29-10-2026 con un sitio de dos páginas hecho con una plantilla de Google Sites,
+sin publicar.
 
 **1. Sacar el sitio con Google Takeout.** Google Sites no tiene un botón de
 descargar, pero Google Takeout (takeout.google.com) exporta el sitio dentro de los
@@ -115,36 +116,28 @@ datos de Drive. Para no exportar todo Drive:
 - Crea la exportación. Google avisa por correo cuando está lista (en la prueba,
   en unos minutos) y pide la contraseña de la cuenta al descargar el ZIP.
 
-Dentro del ZIP, cada página del sitio es un archivo `.html`, con sus imágenes en
-una carpeta del mismo nombre. En la prueba, con un sitio sin publicar, salieron
-en una carpeta `DRAFT` (borrador). Los nombres de archivo pierden las tildes
-(«Documentación» llegó como `Documentacin.html`).
+**2. Convertir el ZIP con eXeConvert** (https://execonvert.github.io/), de
+Juan José de Haro. Se sube el ZIP de Takeout tal como llega, sin abrirlo, y se
+guarda como `.elpx`. Hace falta la versión 0.7.0 o posterior (29-10-2026); las
+anteriores convertían una sola página por ZIP.
 
-**2. Convertir cada página con eXeConvert** (https://execonvert.github.io/), de
-Juan José de Haro, que importa páginas HTML a `.elpx`. Para que entren las
-imágenes, hay que hacer un ZIP con el `.html` de la página y su carpeta de
-imágenes, y subir ese ZIP. Una página por ZIP: si van varias, se convierte solo
-una. Los encabezados de la página se convierten en bloques de eXeLearning.
-
-**Qué llega y qué no** (comparando la página original con la convertida):
-- Llegan el texto, los encabezados, las listas, los enlaces y las imágenes que
-  van dentro del contenido.
+**Qué llega y qué no** (comparando el sitio original con el convertido):
+- Cada página del sitio es una página del proyecto, en el orden del menú de
+  Google Sites, con sus subpáginas debajo y con el nombre que lleva en el menú.
+  El proyecto toma el nombre del sitio.
+- Llegan el texto, los encabezados, las listas y las imágenes que van dentro
+  del contenido. Los encabezados de cada página se convierten en bloques de
+  eXeLearning.
+- Los enlaces entre páginas del sitio siguen funcionando: pasan a ser enlaces
+  internos de eXeLearning. Un enlace a una sección de una página lleva al
+  principio de esa página. Los enlaces a otras webs se mantienen.
+- Las imágenes se guardan como archivos del proyecto, y las de más de 1920 px
+  de lado se reducen a esa medida, que basta para verlas en eXeLearning. En la
+  prueba, el sitio con una foto grande quedó en 2,4 MB (la foto sola pesaba
+  4,7 MB), y eXeLearning 4.0.5 y 4.0.6 lo exportaron como sitio web con sus
+  imágenes y sus enlaces.
 - No llegan el diseño de Google Sites (columnas, tarjetas, la imagen de fondo de
-  la cabecera) ni el menú del sitio. Las secciones desplegables quedan abiertas.
-- Desde la versión 0.6.4 de eXeConvert (29-10-2026):
-  - La página toma el título de la pestaña del navegador: en la página de
-    inicio, el nombre del sitio; en las demás, el del sitio y el de la página
-    («Centro de Ayuda - Documentación»), que se puede acortar a mano.
-  - Los enlaces a otras páginas del sitio y a secciones de la misma página se
-    quitan y queda su texto, porque dentro del proyecto no llevarían a ninguna
-    parte: si hacen falta, se rehacen en eXeLearning. Los enlaces a otras webs
-    se mantienen.
-  - Las imágenes se guardan como archivos del proyecto, y las de más de
-    1920 px de lado se reducen a esa medida, que basta para verlas en
-    eXeLearning. En la prueba, la página con una foto grande pasó de 16,5 MB a
-    2,4 MB, y eXeLearning 4.0.5 la abrió y la exportó con sus imágenes.
-
-**3. Juntar las páginas en un proyecto.** Según el manual de la 4.0.5, desde las
-opciones de una página (los tres puntos) se puede importar un proyecto completo,
-que entra como subpáginas de la página elegida. Así se reúnen las páginas
-convertidas. Este paso no se ha probado.
+  la cabecera) ni su menú, que en eXeLearning es el del propio programa. Las
+  secciones desplegables quedan abiertas.
+- Las subpáginas se han probado con un sitio de prueba hecho a mano, no con un
+  Google Sites real con subpáginas.
