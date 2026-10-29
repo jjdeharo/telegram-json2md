@@ -1,9 +1,9 @@
-# eXeLearning: ajustes con código personalizado
+# eXeLearning: recetas probadas
 
-Recetas para cambiar el aspecto de todo un proyecto de eXeLearning con un trozo
-de código, cuando el programa no tiene una opción para hacerlo. Cada receta se
-ha probado en una exportación real: se dice con qué versión, con qué estilos y en
-qué formatos funciona, y en cuáles no.
+Cómo resolver tareas para las que eXeLearning no tiene una opción directa: cambiar
+algo en todas las páginas con un trozo de código, o traer contenido de otro
+sitio. Cada receta se ha probado de verdad: se dice con qué versión, en qué casos
+funciona y en cuáles no, y lo que no se ha podido probar se dice como tal.
 
 Este documento es una síntesis propia. **Cada afirmación indica de dónde sale**:
 el manual, el código del programa, un mensaje del grupo o la prueba hecha.
@@ -12,7 +12,7 @@ el manual, el código del programa, un mensaje del grupo o la prueba hecha.
 
 ---
 
-## Dónde se pone el código
+## Código personalizado: dónde se pone
 
 En **Propiedades del proyecto** (menú Archivo), apartado **Código personalizado**,
 hay dos cuadros: **HEAD** y **Pie de página**. Lo que se escribe en HEAD se añade
@@ -90,3 +90,53 @@ al final de `style.css` en la pestaña Archivos y se exporta el `.elpx` con el
 estilo ya modificado (o el estilo en `.zip` para importarlo en eXeLearning). Este
 recorrido por EdEX no se ha probado con esta regla; lo que se ha probado es que la
 regla funciona dentro del estilo.
+
+---
+
+## Pasar un sitio de Google Sites a eXeLearning
+
+eXeLearning no importa un sitio de Google Sites. Se puede llevar su contenido en
+dos pasos: sacar el sitio de Google como páginas HTML y convertir cada página con
+eXeConvert. **Pasa el contenido, pero no el diseño**, y hay que rematarlo a mano.
+Probado el 29-10-2026 con un sitio de dos páginas hecho con una plantilla de
+Google Sites, sin publicar.
+
+**1. Sacar el sitio con Google Takeout.** Google Sites no tiene un botón de
+descargar, pero Google Takeout (takeout.google.com) exporta el sitio dentro de los
+datos de Drive. Para no exportar todo Drive:
+- Pon el sitio en una carpeta de «Mi unidad», sola. Según la Universidad de
+  Míchigan, un sitio en una unidad compartida no se puede exportar
+  (https://teamdynamix.umich.edu/TDClient/30/Portal/KB/Article/15738/Google-Download-Site-as-HTML-File);
+  esto no se ha probado.
+- En Takeout, desmarca todo, marca Drive y, en la lista de carpetas de Drive,
+  deja marcada solo esa carpeta.
+- Crea la exportación. Google avisa por correo cuando está lista (en la prueba,
+  en unos minutos) y pide la contraseña de la cuenta al descargar el ZIP.
+
+Dentro del ZIP, cada página del sitio es un archivo `.html`, con sus imágenes en
+una carpeta del mismo nombre. En la prueba, con un sitio sin publicar, salieron
+en una carpeta `DRAFT` (borrador). Los nombres de archivo pierden las tildes
+(«Documentación» llegó como `Documentacin.html`).
+
+**2. Convertir cada página con eXeConvert** (https://execonvert.github.io/), de
+Juan José de Haro, que importa páginas HTML a `.elpx`. Para que entren las
+imágenes, hay que hacer un ZIP con el `.html` de la página y su carpeta de
+imágenes, y subir ese ZIP. Una página por ZIP: si van varias, se convierte solo
+una. Los encabezados de la página se convierten en bloques de eXeLearning.
+
+**Qué llega y qué no** (comparando la página original con la convertida):
+- Llegan el texto, los encabezados, las listas, los enlaces y las imágenes que
+  van dentro del contenido.
+- No llegan el diseño de Google Sites (columnas, tarjetas, la imagen de fondo de
+  la cabecera) ni el menú del sitio. Las secciones desplegables quedan abiertas.
+- La página se llama «Página 1»: hay que ponerle el título a mano.
+- Los enlaces que llevaban a otras páginas del sitio siguen apuntando a los
+  archivos `.html` y no funcionan: hay que rehacerlos.
+- Las imágenes van incrustadas en el texto, a su tamaño original. En la prueba,
+  una página con una foto grande dio un `.elpx` de 16 MB: conviene reducir las
+  imágenes antes de hacer el ZIP.
+
+**3. Juntar las páginas en un proyecto.** Según el manual de la 4.0.5, desde las
+opciones de una página (los tres puntos) se puede importar un proyecto completo,
+que entra como subpáginas de la página elegida. Así se reúnen las páginas
+convertidas. Este paso no se ha probado.
