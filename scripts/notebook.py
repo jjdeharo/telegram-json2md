@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Actualiza en NotebookLM la fuente de un mes, a través del CLI `notebooklm`.
 
 Una fuente de NotebookLM no se puede editar: para reflejar el día nuevo hay que

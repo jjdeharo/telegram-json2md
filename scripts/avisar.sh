@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Avisos en pantalla del proceso diario.
 #
 # El proceso lo arranca cron, no Juanjo, así que sin avisos no hay forma de

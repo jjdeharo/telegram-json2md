@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # El reloj de la pasada diaria dentro del contenedor.
 #
 # En el portátil esto lo hacía cron: @reboot y cada cuarto de hora de 7 a 23.

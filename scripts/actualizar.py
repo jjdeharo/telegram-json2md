@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Pone al día las conversaciones de los grupos y sus fuentes en NotebookLM.
 
 Se ejecuta una vez al día, normalmente lanzado por scripts/diario.sh. Trabaja

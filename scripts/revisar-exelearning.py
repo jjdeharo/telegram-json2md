@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Revisión periódica del cuaderno de eXeLearning: lo que el script no decide solo.
 
 La sincronización diaria mantiene al día los documentos de una lista fija. Lo que

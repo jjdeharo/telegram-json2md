@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Clona en /repos los repositorios que el sincronizador de eXeLearning lee.
 # Por HTTPS y anónimo: aquí solo se lee. Se puede volver a lanzar sin miedo.
 set -u

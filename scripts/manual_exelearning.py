@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Consolida el manual web de eXeLearning en un único Markdown.
 
 El manual oficial de CEDEC/INTEF es un sitio de más de ochenta páginas. Subirlo

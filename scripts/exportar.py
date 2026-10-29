@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Exporta de Telegram los mensajes de un mes a datos/<prefijo>-YYYY-MM.json.
 
 Se exporta el mes natural completo, no solo el día pendiente. Cuesta unos

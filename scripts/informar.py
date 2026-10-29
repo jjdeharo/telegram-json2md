@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Manda un aviso por Telegram a Juanjo.
 
 Los carteles en pantalla solo sirven si hay alguien delante del ordenador, y esto

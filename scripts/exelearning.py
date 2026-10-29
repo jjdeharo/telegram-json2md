@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Sincroniza la documentación de eXeLearning con su cuaderno de NotebookLM.
 
 El cuaderno «Karla» responde a usuarios de eXeLearning, pero con criterio de

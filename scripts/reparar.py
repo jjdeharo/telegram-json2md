@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Cuando la pasada diaria falla, busca la solución en vez de limitarse a avisar.
 
 Casi todo lo que puede romperse aquí depende de una herramienta no oficial

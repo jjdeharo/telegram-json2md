@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Instala (o quita) el disparo automático diario en el crontab del usuario.
 #
 #   ./instalar.sh           añade las líneas, respetando las que ya hubiera

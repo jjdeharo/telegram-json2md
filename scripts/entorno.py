@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Asegura que el proceso corre con el Python del entorno propio del proyecto.
 
 Telethon y BeautifulSoup no pueden quedarse en manos del paquete de Debian: el

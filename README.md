@@ -115,3 +115,11 @@ autorizada en `sesion/telegram.session`; a partir de ahí no vuelve a pedir nada
 `web/index.html` es una herramienta aparte y autónoma: se abre en el navegador,
 se le sueltan los JSON exportados de Telegram y produce el mismo Markdown, sin
 instalar nada ni subir los datos a ningún sitio. Ver [web/README.md](web/README.md).
+
+## Licencias
+
+- Código: [AGPL v3](LICENSE) (`AGPL-3.0-or-later`).
+- Documentación: [CC BY-SA 4.0](LICENSE-CONTENIDOS).
+- La web usa [JSZip](https://stuk.github.io/jszip/) 3.10.1 (MIT o GPLv3).
+
+© 2025-2026 [Juan José de Haro](https://bilateria.org).

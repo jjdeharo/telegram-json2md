@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Actualiza el CLI de NotebookLM cuando sale una versión, y lo comprueba.
 
 Todo el trato con NotebookLM pasa por `notebooklm-py`, que es una herramienta no

@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!--
+  Conversor de JSON de Telegram a Markdown
+  SPDX-License-Identifier: AGPL-3.0-or-later
+  © 2025-2026 Juan José de Haro
+-->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -163,6 +168,17 @@
         .current-month:hover {
             background-color: #218838 !important;
         }
+        .pie {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            font-size: 13px;
+            color: #555;
+            text-align: center;
+        }
+        .pie p {
+            margin: 4px 0;
+        }
     </style>
 </head>
 <body>
@@ -193,6 +209,14 @@
             </div>
         </div>
     </div>
+
+    <footer class="pie">
+        <p>© 2025-2026 <a href="https://bilateria.org" target="_blank" rel="noopener">Juan José de Haro</a> ·
+            código bajo licencia <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3</a> ·
+            <a href="https://github.com/jjdeharo/telegram-json2md" target="_blank" rel="noopener">código fuente</a></p>
+        <p>Hecho con IA (<a href="https://jjdeharo.github.io/miae/?nivel=4" target="_blank" rel="noopener">nivel 4 del MIAE</a>) ·
+            Usa <a href="https://stuk.github.io/jszip/" target="_blank" rel="noopener">JSZip</a> 3.10.1 (Stuart Knightley y colaboradores, licencia MIT o GPLv3).</p>
+    </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>

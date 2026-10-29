@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Resume en unas líneas lo que hizo la pasada del día y lo manda por Telegram.
 
 La pasada avisa por su cuenta cuando ocurre algo gordo —una reparación, una

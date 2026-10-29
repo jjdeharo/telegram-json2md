@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Pasada diaria. La lanza cron al encender el ordenador y, durante el día, cada
 # cuarto de hora, hasta que una pasada sale bien. No está pensado para
 # ejecutarse a mano, aunque puede hacerse: es idempotente.

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Convierte los JSON exportados en salida/<carpeta>/conversacion-YYYY-MM.md.
 
 La conversión en sí (hilos, días, formato) la hace procesar_telegram.py, que es

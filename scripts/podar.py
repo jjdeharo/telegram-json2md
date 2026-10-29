@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Mantiene acotado lo que el proceso diario va dejando por el camino.
 
 El archivo de conversaciones —salida/— crece por definición: es la memoria de

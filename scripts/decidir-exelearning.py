@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Decide sola qué hacer con la documentación nueva del repositorio de eXeLearning.
 
 La revisión mensual detecta que han aparecido documentos que nadie ha clasificado,
