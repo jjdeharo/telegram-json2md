@@ -131,12 +131,18 @@ una. Los encabezados de la página se convierten en bloques de eXeLearning.
   van dentro del contenido.
 - No llegan el diseño de Google Sites (columnas, tarjetas, la imagen de fondo de
   la cabecera) ni el menú del sitio. Las secciones desplegables quedan abiertas.
-- La página se llama «Página 1»: hay que ponerle el título a mano.
-- Los enlaces que llevaban a otras páginas del sitio siguen apuntando a los
-  archivos `.html` y no funcionan: hay que rehacerlos.
-- Las imágenes van incrustadas en el texto, a su tamaño original. En la prueba,
-  una página con una foto grande dio un `.elpx` de 16 MB: conviene reducir las
-  imágenes antes de hacer el ZIP.
+- Desde la versión 0.6.4 de eXeConvert (29-10-2026):
+  - La página toma el título de la pestaña del navegador: en la página de
+    inicio, el nombre del sitio; en las demás, el del sitio y el de la página
+    («Centro de Ayuda - Documentación»), que se puede acortar a mano.
+  - Los enlaces a otras páginas del sitio y a secciones de la misma página se
+    quitan y queda su texto, porque dentro del proyecto no llevarían a ninguna
+    parte: si hacen falta, se rehacen en eXeLearning. Los enlaces a otras webs
+    se mantienen.
+  - Las imágenes se guardan como archivos del proyecto, y las de más de
+    1920 px de lado se reducen a esa medida, que basta para verlas en
+    eXeLearning. En la prueba, la página con una foto grande pasó de 16,5 MB a
+    2,4 MB, y eXeLearning 4.0.5 la abrió y la exportó con sus imágenes.
 
 **3. Juntar las páginas en un proyecto.** Según el manual de la 4.0.5, desde las
 opciones de una página (los tres puntos) se puede importar un proyecto completo,
