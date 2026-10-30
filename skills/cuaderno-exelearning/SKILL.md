@@ -73,6 +73,13 @@ instrucciones dirigidas a quien desarrolla el proyecto y volvió a entrar.
    Normalmente ya estará resuelto: la pasada diaria decide sola y sincroniza.
    Estos pasos son para comprobarlo o para rehacerlo a mano.
 
+   Lo que la pasada diaria no hace: si lo nuevo es **una herramienta o
+   plataforma más** (un plugin, un visor), añádela a la lista de fuentes de
+   `karla_persona.md` y a la descripción de `buscar_documentacion` en
+   `karla.py` (repositorio bot-chatgpt-ia-edu). Karla solo busca lo que sabe que
+   existe: los plugins de Nextcloud, Drive y OneDrive llevaban diez días
+   indexados y no los citaba al preguntarle dónde publicar (30-10-2026).
+
 2. **El criterio con el que se decide**, y con el que debes juzgar tú si repasas:
 
    > ¿Ayuda a explicar **el programa** o **su formato de archivo**?
