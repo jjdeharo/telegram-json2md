@@ -10,7 +10,53 @@ el equipo de eXeLearning (Ignacio, Cristina, Martín Núñez, Ernesto Serrano) s
 señala; cuando viene de la experiencia de un usuario, también, porque no tiene el
 mismo valor.
 
-Última revisión: 2 de septiembre de 2026.
+Última revisión: 30 de octubre de 2026.
+
+---
+
+## Dónde se puede publicar
+
+Hay dos caminos, y una respuesta completa cuenta los dos:
+
+1. **Exportar** desde eXeLearning (sitio web, página sola, SCORM 1.2, IMS,
+   ePub3, PDF) y subir el resultado a la plataforma. Es lo que explica el manual
+   de usuario.
+2. **Usar el plugin de la plataforma**: el recurso (`.elpx`) se crea, se edita y
+   se publica sin salir de ella, con el editor de eXeLearning integrado. Todos
+   son gratuitos y de código abierto.
+
+| Plataforma | Plugin | Qué permite | Quién lo instala |
+|---|---|---|---|
+| Moodle | `mod_exelearning` (Recurso eXeLearning), **el recomendado** | Actividades que se califican solas, una columna por ejercicio | Administración del Moodle |
+| Moodle | `mod_exescorm` | Paquete SCORM 1.2, una nota global | Administración del Moodle |
+| Moodle | `mod_exeweb` | Materiales de consulta, sin nota | Administración del Moodle |
+| Nextcloud | app eXeLearning | Ver, editar y crear recursos desde Archivos | Administración del Nextcloud |
+| WordPress | plugin eXeLearning | Subir el recurso a Medios, editarlo y mostrarlo en entradas y páginas con un bloque o un código corto | Administración del WordPress |
+| Omeka S | módulo ExeLearning | Añadir recursos como medios de las fichas, verlos y editarlos | Administración del Omeka S |
+| Google Drive | eXeLearning para Google Drive (`exelearning.github.io/gdrive-exelearning`) | Abrir, editar y crear recursos guardados en Drive y compartirlos con el alumnado con un enlace público | Nadie: cada docente entra con su cuenta |
+| OneDrive | eXeLearning para OneDrive (`exelearning.github.io/onedrive-exelearning`) | Abrir, editar y crear recursos guardados en OneDrive | Nadie: cada docente entra con su cuenta |
+
+Fuente: documentación oficial de los plugins (`doc/plugins/` del repositorio de
+eXeLearning, publicada el 19/10/2026). Cada plugin tiene una demostración que se
+abre en el navegador sin instalar nada (Moodle, Nextcloud, WordPress y Omeka S
+Playground); los enlaces están en esa documentación.
+
+Detalles que suelen preguntarse:
+
+- **Requisitos.** `mod_exelearning` pide Moodle 4.5 o posterior; `mod_exescorm`
+  y `mod_exeweb`, Moodle 4.2. La app de Nextcloud, Nextcloud 31 a 33 (la 4.0.5
+  del plugin, solo la 33). WordPress 6.1 y PHP 8.0. Omeka S 4.0.
+- **Google Drive y OneDrive con cuentas del centro.** Si el dominio de Google
+  Workspace restringe aplicaciones de terceros, la administración tiene que
+  permitir eXeLearning; en Microsoft 365, si los usuarios no pueden aceptar
+  aplicaciones, la administración concede el consentimiento («Se necesita la
+  aprobación del administrador»). El enlace público de Drive exige que el
+  dominio permita compartir con «Cualquier persona con el enlace».
+- **OneDrive no añade eXeLearning a sus menús**: siempre se empieza desde la
+  página de la aplicación. En Drive, sí aparece en **Abrir con** y **Nuevo**.
+- **No es lo que había en la 3.x.** La subida a Dropbox y Google Drive desde el
+  propio programa se retiró en la 4.0.1 (registro de cambios); los plugins de
+  Drive y OneDrive son aplicaciones aparte.
 
 ---
 
@@ -71,15 +117,21 @@ haya visto (JM, 16/06/2026).
 
 ### Los plugins oficiales de Moodle
 
-Hay dos, mantenidos por el proyecto:
+Hay tres, mantenidos por el proyecto, que pueden convivir en el mismo Moodle:
 
-- **mod_exescorm** — `github.com/exelearning/mod_exescorm`
-- **mod_exeweb** — `github.com/exelearning/mod_exeweb`
+- **mod_exelearning** (Recurso eXeLearning) — `github.com/exelearning/moodle-mod_exelearning`.
+  Es el recomendado para contenidos nuevos: conserva el menú del recurso y manda
+  al libro de calificaciones la nota de cada ejercicio por separado. Requiere
+  **Moodle 4.5** o posterior.
+- **mod_exescorm** — `github.com/exelearning/mod_exescorm`. Paquete SCORM 1.2,
+  una nota global.
+- **mod_exeweb** — `github.com/exelearning/mod_exeweb`. Sitio web, sin nota.
 
-Ambos requieren **Moodle 4.2 como mínimo** y están verificados hasta Moodle 5.2.x
-(README de los plugins, `version.php`). Los dos incluyen un editor de eXeLearning
-integrado, así que se puede editar el contenido dentro de Moodle sin servidor
-externo.
+`mod_exescorm` y `mod_exeweb` requieren **Moodle 4.2 como mínimo** y están
+verificados hasta Moodle 5.2.x (README de los plugins, `version.php`). Los tres
+incluyen un editor de eXeLearning integrado, así que se puede editar el
+contenido dentro de Moodle sin servidor externo (documentación oficial de los
+plugins, 19/10/2026).
 
 **El fallo más repetido del grupo, con diferencia**: una plataforma institucional
 rechaza un exportado hecho con eXeLearning 3.x o 4.x, o lo muestra mal. La causa
@@ -96,7 +148,8 @@ No hay nada que el docente pueda hacer desde su lado salvo pedir la
 actualización, o exportar en 2.9 mientras tanto.
 
 Si la plataforma va por Moodle 3.x, los plugins **no se pueden instalar**: por
-debajo de Moodle 4.2 solo queda la actividad SCORM estándar de Moodle.
+debajo de Moodle 4.2 solo queda la actividad SCORM estándar de Moodle; entre la
+4.2 y la 4.4, `mod_exescorm` y `mod_exeweb`, pero no `mod_exelearning`.
 
 ### Comprobar si el problema es del paquete o de Moodle
 
