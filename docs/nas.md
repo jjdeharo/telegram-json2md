@@ -30,10 +30,11 @@ carpeta del contenedor y reconstruye la imagen si ha cambiado el `Dockerfile` o
 `bucle.sh`, sin cortar una pasada en marcha (`nas/despliegue.conf`). Los scripts
 se leen en cada pasada, así que no hace falta reiniciar nada.
 
-Si la reparación automática o el decisor de eXeLearning han editado algo en el
-NAS, `desplegar-nas` no sube nada: enseña la diferencia y la guarda en el
-portátil para incorporarla al repositorio. `desplegar-nas --comprobar` dice qué
-commit corre allí y si hay cambios propios.
+Si la reparación automática o el decisor de eXeLearning editan algo en el NAS,
+el vigía lo sube solo a GitHub en cuanto el contenedor termina la pasada, como
+«Reparador del NAS» (ADR 0012 de `vigilancia-nas`). Por eso, antes de trabajar
+aquí, `git pull`; `desplegar-nas` lo pide si falta. `desplegar-nas --comprobar`
+dice qué commit corre en el NAS y si hay cambios todavía sin subir.
 
 ## El modelo de Claude
 
