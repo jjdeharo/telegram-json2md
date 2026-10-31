@@ -115,6 +115,9 @@ reparar() {   # reparar <motivo>
 
 if "$PY" "$BASE/scripts/actualizar.py" || { reparar "el archivado de las conversaciones falló" &&
      "$PY" "$BASE/scripts/actualizar.py"; }; then
+  # El registro de administradores de los cuatro grupos solo dura 48 horas:
+  # se copia cada día para ver qué borra el antispam de Telegram (ADR 0003).
+  "$PY" "$BASE/scripts/registro-admin.py" || true
   sincronizar_exelearning
   revisar_exelearning
   # La marca se pone solo si la pasada terminó bien. Si falló, los disparos del
