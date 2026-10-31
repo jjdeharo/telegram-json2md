@@ -14,13 +14,26 @@ cambia es dónde está y quién lo dispara.
 /volume1/docker/memoria-telegram/
   compose.yml  Dockerfile  bucle.sh   la definición del contenedor (copia de nas/)
   clonar-repos.sh                     clona los repositorios de eXeLearning
-  repo/     clon de este repositorio, con los datos dentro (se monta en /proyecto)
+  repo/     clon de git de este repositorio, con los datos dentro (se monta en /proyecto)
   repos/    exelearning y su ecosistema, que lee el sincronizador (en /repos)
   home/     el home del contenedor: .notebooklm, .claude, .config/avisar-juanjo
 ```
 
 Nada importante vive dentro de la imagen: reconstruirla no toca ni los datos ni
 las sesiones. Lo que hay que respaldar es `repo/` y `home/`.
+
+## Cómo llega un cambio
+
+Desde el portátil, después del push, `desplegar-nas` (del repositorio
+`vigilancia-nas`): lleva al NAS el commit, copia los archivos de `nas/` a la
+carpeta del contenedor y reconstruye la imagen si ha cambiado el `Dockerfile` o
+`bucle.sh`, sin cortar una pasada en marcha (`nas/despliegue.conf`). Los scripts
+se leen en cada pasada, así que no hace falta reiniciar nada.
+
+Si la reparación automática o el decisor de eXeLearning han editado algo en el
+NAS, `desplegar-nas` no sube nada: enseña la diferencia y la guarda en el
+portátil para incorporarla al repositorio. `desplegar-nas --comprobar` dice qué
+commit corre allí y si hay cambios propios.
 
 ## El modelo de Claude
 
