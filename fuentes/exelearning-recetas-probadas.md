@@ -159,7 +159,8 @@ su contenido y en su sitio.
 
 **No hay que fiarse del aviso.** Al borrar un iDevice, eXeLearning pregunta
 «¿Eliminar el iDevice? Esta acción no se puede deshacer», pero sí se puede. Al
-borrar una página, en cambio, el aviso ya dice que se puede deshacer.
+borrar una página, en cambio, el aviso ya dice que se puede deshacer. Está avisado
+al equipo en la incidencia https://github.com/exelearning/exelearning/issues/2685.
 
 **Cuándo no funciona:**
 - Si hay un iDevice abierto para editar, primero hay que cerrarlo (guardándolo o
