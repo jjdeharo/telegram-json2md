@@ -1,14 +1,14 @@
 # eXeLearning: recetas probadas
 
-Cómo resolver tareas para las que eXeLearning no tiene una opción directa: cambiar
+Cómo resolver tareas para las que eXeLearning no tiene una opción directa (cambiar
 algo en todas las páginas con un trozo de código, o traer contenido de otro
-sitio. Cada receta se ha probado de verdad: se dice con qué versión, en qué casos
+sitio) o que el programa permite aunque no lo parezca. Cada receta se ha probado de verdad: se dice con qué versión, en qué casos
 funciona y en cuáles no, y lo que no se ha podido probar se dice como tal.
 
 Este documento es una síntesis propia. **Cada afirmación indica de dónde sale**:
 el manual, el código del programa, un mensaje del grupo o la prueba hecha.
 
-Última revisión: 29 de octubre de 2026.
+Última revisión: 1 de noviembre de 2026.
 
 ---
 
@@ -147,3 +147,34 @@ Una página suelta se puede subir como `.html` o en un ZIP con sus imágenes.
 Probado el 29-10-2026 con dos Google Sites, uno de ellos de 27 páginas, y con la
 web de MkDocs descargada con `wget`. eXeLearning 4.0.6 abrió los proyectos y
 los exportó con sus imágenes y sus enlaces.
+
+---
+
+## Recuperar un iDevice, un bloque o una página que se ha borrado
+
+Mientras el proyecto siga abierto, se recupera con **Deshacer**: la flecha hacia
+la izquierda de la barra superior, junto al menú Ayuda, o **Ctrl+Z** (**⌘+Z** en
+Mac). La flecha de al lado, o **Ctrl+Mayús+Z**, lo rehace. El iDevice vuelve con
+su contenido y en su sitio.
+
+**No hay que fiarse del aviso.** Al borrar un iDevice, eXeLearning pregunta
+«¿Eliminar el iDevice? Esta acción no se puede deshacer», pero sí se puede. Al
+borrar una página, en cambio, el aviso ya dice que se puede deshacer.
+
+**Cuándo no funciona:**
+- Si hay un iDevice abierto para editar, primero hay que cerrarlo (guardándolo o
+  descartando los cambios): mientras está abierto, Ctrl+Z deshace dentro de ese
+  iDevice, no en el proyecto.
+- Deshacer va paso a paso hacia atrás: si después de borrar se hicieron otros
+  cambios, se deshacen antes esos.
+- El historial se pierde al cerrar el proyecto o abrir otro. Entonces solo queda
+  una copia guardada antes de borrarlo: si desde que se borró no se ha guardado,
+  se puede cerrar sin guardar y volver a abrir el archivo, a costa de perder todo
+  lo hecho desde la última vez que se guardó.
+
+**Probado** el 1-11-2026 en la versión en desarrollo de eXeLearning en línea
+(online.exelearning.dev): un iDevice de texto borrado volvió con la flecha y con
+Ctrl+Z. Con bloques y páginas no se ha probado: según el código, el mismo
+historial guarda todos los cambios de la estructura del proyecto. En el código
+del programa, Deshacer existe desde la 4.0.0, y la parte que lo hace es igual en
+la 4.0.6 que en la versión probada; en la 4.0.6 instalada no se ha probado.
