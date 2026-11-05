@@ -150,6 +150,27 @@ los exportó con sus imágenes y sus enlaces.
 
 ---
 
+## Saltos de línea en la retroalimentación del Formulario
+
+En el iDevice **Formulario**, los campos de retroalimentación de cada pregunta
+(el que se muestra al acertar y el que se muestra al fallar) son de una sola
+línea: la tecla Intro no hace un salto. Para partir el texto, se escribe
+`<br>` donde tiene que ir el salto:
+
+```
+¡Correcto!<br>El agua hierve a 100 °C a nivel del mar.
+```
+
+**Probado** el 5-11-2026 con eXeLearning 4.0.6 en una pregunta de verdadero o
+falso: el texto sale en varias líneas en el editor y en la vista previa, y el
+`<br>` se conserva al volver a editar la pregunta. Según el código del
+programa, los otros tipos de pregunta del Formulario (rellenar, desplegable y
+selección) usan los mismos campos; con ellos no se ha probado. Otra vía que
+encontró un usuario del grupo, `\( \\ \)`, también parte la línea, pero lo
+hace con el motor de fórmulas; `<br>` es más directo.
+
+---
+
 ## Crear un proyecto a partir de un PDF o de un documento de LibreOffice
 
 eXeLearning no importa PDF ni documentos de oficina: solo abre e importa
