@@ -8,7 +8,7 @@ funciona y en cuáles no, y lo que no se ha podido probar se dice como tal.
 Este documento es una síntesis propia. **Cada afirmación indica de dónde sale**:
 el manual, el código del programa, un mensaje del grupo o la prueba hecha.
 
-Última revisión: 1 de noviembre de 2026.
+Última revisión: 5 de noviembre de 2026.
 
 ---
 
@@ -147,6 +147,46 @@ Una página suelta se puede subir como `.html` o en un ZIP con sus imágenes.
 Probado el 29-10-2026 con dos Google Sites, uno de ellos de 27 páginas, y con la
 web de MkDocs descargada con `wget`. eXeLearning 4.0.6 abrió los proyectos y
 los exportó con sus imágenes y sus enlaces.
+
+---
+
+## Crear un proyecto a partir de un PDF o de un documento de LibreOffice
+
+eXeLearning no importa PDF ni documentos de oficina: solo abre e importa
+proyectos (`.elpx`, `.elp`), paquetes `.zip` editables y `.epub` (código de la
+4.0.6). Para traer su contenido está eXeConvert (https://execonvert.github.io/),
+de Juan José de Haro, que lo convierte en un proyecto de eXeLearning (`.elpx`)
+en el navegador, sin subir el archivo a ningún sitio. **Pasa el contenido, no
+el diseño.**
+
+**PDF** (desde la versión 0.8.0 de eXeConvert, solo en la web):
+1. Abre el PDF en eXeConvert, elige cómo se reparten las páginas (qué títulos
+   abren página nueva) y pulsa **Previsualizar**.
+2. En la ventana que se abre se eligen las páginas del PDF, se quitan los
+   encabezados y pies repetidos, se conservan las imágenes y, si hay páginas
+   escaneadas, se puede aplicar OCR para tener su texto. Pulsa **Convertir**,
+   revisa la vista previa y pulsa **Crear el proyecto**.
+3. Revisa la vista previa del proyecto y guarda el `.elpx`.
+
+Llegan el texto, los títulos, las listas, las tablas con líneas, las imágenes y
+las notas al pie (al final de la sección que las cita). No llegan el diseño ni
+las columnas, y una tabla sin líneas verticales sale como párrafos. La primera
+vez descarga el conversor (unos 34 MB), y en Firefox tarda algo más que en
+Chrome.
+
+**Documento de texto de LibreOffice (`.odt`)**: en LibreOffice, **Archivo >
+Guardar como** en formato Word (`.docx`), que conserva mejor el formato que un
+PDF, y abre ese `.docx` en eXeConvert.
+
+**Presentación (`.odp` o `.pptx`)**: eXeConvert no las abre. Exporta la
+presentación a PDF desde LibreOffice o PowerPoint y sigue los pasos del PDF;
+llega el texto de cada diapositiva, no su composición.
+
+**Probado** el 5-11-2026 con eXeConvert 0.8.0, en Chromium y en Firefox, con
+tres PDF: uno con notas al pie y una tabla, uno con imagen, tablas y
+encabezados repetidos, y uno escaneado con OCR. La vista previa de eXeConvert,
+que usa el motor de eXeLearning 4.0.6, mostró el proyecto con sus páginas,
+imágenes y notas. Lo de los `.odt` y las presentaciones no se ha probado.
 
 ---
 
