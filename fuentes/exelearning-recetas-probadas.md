@@ -180,7 +180,8 @@ de Juan José de Haro, que lo convierte en un proyecto de eXeLearning (`.elpx`)
 en el navegador, sin subir el archivo a ningún sitio. **Pasa el contenido, no
 el diseño.**
 
-**PDF** (desde la versión 0.8.0 de eXeConvert, solo en la web):
+**PDF** (desde la versión 0.8.0 de eXeConvert en la web, y desde la 0.9.0 también
+en la versión de terminal y sus instaladores):
 1. Abre el PDF en eXeConvert, elige cómo se reparten las páginas (qué títulos
    abren página nueva) y pulsa **Previsualizar**.
 2. En la ventana que se abre se eligen las páginas del PDF, se quitan los
@@ -188,6 +189,11 @@ el diseño.**
    escaneadas, se puede aplicar OCR para tener su texto. Pulsa **Convertir**,
    revisa la vista previa y pulsa **Crear el proyecto**.
 3. Revisa la vista previa del proyecto y guarda el `.elpx`.
+
+En la versión de terminal, las opciones van en la orden:
+`execonvert informe.pdf informe.elpx --pages 1-10 --ocr` (con `--keep-headers`
+se conservan los encabezados repetidos y con `--no-images` se dejan fuera las
+imágenes). La primera vez que se usa el OCR en un idioma descarga sus datos.
 
 Llegan el texto, los títulos, las listas, las tablas con líneas, las imágenes y
 las notas al pie (al final de la sección que las cita). No llegan el diseño ni
@@ -203,11 +209,13 @@ PDF, y abre ese `.docx` en eXeConvert.
 presentación a PDF desde LibreOffice o PowerPoint y sigue los pasos del PDF;
 llega el texto de cada diapositiva, no su composición.
 
-**Probado** el 5-11-2026 con eXeConvert 0.8.0, en Chromium y en Firefox, con
+**Probado** el 5-11-2026 con eXeConvert 0.8.0 (web), en Chromium y en Firefox, con
 tres PDF: uno con notas al pie y una tabla, uno con imagen, tablas y
 encabezados repetidos, y uno escaneado con OCR. La vista previa de eXeConvert,
 que usa el motor de eXeLearning 4.0.6, mostró el proyecto con sus páginas,
-imágenes y notas. Lo de los `.odt` y las presentaciones no se ha probado.
+imágenes y notas. La versión de terminal 0.9.0 se probó con los mismos PDF en
+Linux y en Windows (instalador `.exe`), OCR incluido, y da el mismo proyecto.
+Lo de los `.odt` y las presentaciones no se ha probado.
 
 ---
 
