@@ -8,7 +8,7 @@ funciona y en cuáles no, y lo que no se ha podido probar se dice como tal.
 Este documento es una síntesis propia. **Cada afirmación indica de dónde sale**:
 el manual, el código del programa, un mensaje del grupo o la prueba hecha.
 
-Última revisión: 5 de noviembre de 2026.
+Última revisión: 14 de noviembre de 2026.
 
 ---
 
@@ -248,3 +248,137 @@ Ctrl+Z. Con bloques y páginas no se ha probado: según el código, el mismo
 historial guarda todos los cambios de la estructura del proyecto. En el código
 del programa, Deshacer existe desde la 4.0.0, y la parte que lo hace es igual en
 la 4.0.6 que en la versión probada; en la 4.0.6 instalada no se ha probado.
+
+---
+
+## Números de una lista en negrita
+
+El editor no tiene una opción para dar formato solo a los números (o a las
+viñetas) de una lista: si se selecciona la lista y se pone en negrita, se pone en
+negrita el texto, no los números. Está pedido al equipo en la incidencia
+https://github.com/exelearning/exelearning/issues/1514 (abierta). Mientras, se
+hace en el código de la lista: se pone la negrita a toda la lista y se le quita
+al texto de cada elemento.
+
+1. En el iDevice, pulsa el botón **Editar el código fuente (editor avanzado)**
+   de la barra del editor.
+2. Cambia `<ol>` por `<ol style="font-weight: bold;">` y envuelve el texto de
+   cada elemento en `<span style="font-weight: normal;">…</span>`:
+
+```html
+<ol style="font-weight: bold;">
+<li><span style="font-weight: normal;">Primer paso</span></li>
+<li><span style="font-weight: normal;">Segundo paso</span></li>
+</ol>
+```
+
+Solo afecta a esa lista, y como el estilo va dentro del propio contenido, no
+depende del cuadro de Código personalizado.
+
+**Probado** el 14-11-2026 con los archivos de eXeLearning 4.0.6 abiertos como
+web, en Chromium y en Firefox, en un iDevice de texto: después de guardarlo, los
+números salen en negrita y el texto normal, en el editor y en la vista previa
+(esta, comprobada en Chromium). No se ha probado: el mismo truco con `color` para
+cambiar el color de los números, con viñetas (`<ul>`), en las exportaciones, ni
+qué pasa al añadir elementos nuevos después desde el editor visual (conviene
+revisar el código).
+
+---
+
+## GeoGebra: applets propios y por qué no se ven al editar
+
+Hay dos maneras de poner un applet de GeoGebra:
+
+- **El iDevice GeoGebra** (categoría Ciencias) solo acepta la dirección de un
+  material publicado en geogebra.org (`https://www.geogebra.org/m/VgHhQXCC`) o
+  su identificador (`VgHhQXCC`). No admite un archivo `.ggb` ni el parámetro
+  `ggbBase64` (código de la 4.0.6).
+- **El código de GeoGebra en un iDevice de texto**, con el botón **Editar el
+  código fuente (editor avanzado)**. Sirve para un applet que no está publicado,
+  pasándolo en `ggbBase64`:
+
+```html
+<div id="ggbApplet1"></div>
+<script src="https://www.geogebra.org/apps/deployggb.js"></script>
+<script>
+var params = {"appName": "classic", "width": 600, "height": 400, "ggbBase64": "UEsDBBQ…"};
+var applet = new GGBApplet(params, true);
+window.addEventListener("load", function () { applet.inject("ggbApplet1"); });
+</script>
+```
+
+  `ggbBase64` es el archivo `.ggb` entero pasado a base64; en Linux,
+  `base64 -w0 archivo.ggb` lo escribe en una línea. Con
+  `"material_id": "VgHhQXCC"` en lugar de `ggbBase64` se carga uno publicado. Si
+  hay varios applets en la misma página, cada uno necesita su propio `id`.
+
+**Que no se vea mientras se edita es normal.** eXeLearning desactiva los scripts
+dentro del editor (los guarda como `type="text/plain"` con
+`data-exe-inert-script`) para que no se ejecuten mientras se trabaja: en el
+editor queda el hueco vacío, y el applet aparece en la vista previa y en lo que
+se exporta.
+
+Las dos maneras cargan GeoGebra de geogebra.org cada vez que se abre la página,
+así que necesitan conexión a internet (según el código; sin conexión no se ha
+probado).
+
+**Probado** el 14-11-2026 con los archivos de eXeLearning 4.0.6 abiertos como
+web, en Chromium: con `material_id` y con `ggbBase64` (un `.ggb` con dos
+puntos), el editor deja el hueco vacío y la vista previa muestra el applet. En
+Firefox y en la versión de escritorio no se ha probado.
+
+---
+
+## Liberar espacio en disco en la versión de escritorio
+
+La versión de escritorio guarda sus datos en una carpeta del usuario:
+
+- **Linux**: `~/.config/exelearning` (comprobado).
+- **Windows**: `%APPDATA%\exelearning`, y **macOS**:
+  `~/Library/Application Support/exelearning`, según la forma en que guardan sus
+  datos los programas hechos como este (con Electron); no se ha comprobado en
+  esos sistemas.
+
+Lo que más ocupa suele ser:
+
+- **Los restos de la versión 3**: las carpetas `data` y `cache` y el archivo
+  `exelearning.db`. La 4 no los usa ni los borra. En un equipo real eran
+  340 MB de 537. **Antes de borrarlos**: `data/perm/odes` guarda copias
+  automáticas (`.elpx`) de proyectos hechos con la 3; si falta alguno, se copia
+  de ahí.
+- **Las cachés del navegador interno**: las carpetas `Cache`, `Code Cache` y
+  `GPUCache`. Se vuelven a crear solas.
+
+Los proyectos abiertos no se acumulan: eXeLearning borra sus datos de trabajo al
+cerrarlos (código de la 4.0.6). Para limpiar: **cierra eXeLearning**, borra esas
+carpetas y vuelve a abrirlo.
+
+El programa en sí, instalado con el paquete `.deb` en Ubuntu o Debian, está en
+`/opt/eXeLearning`. Los iDevices y estilos que trae van empaquetados dentro de
+`/opt/eXeLearning/resources/app.asar`, así que no se pueden modificar ahí, y
+cada actualización lo sustituye entero.
+
+**Probado** el 14-11-2026 con eXeLearning 4.0.6 de escritorio en Linux, sobre
+una copia de la carpeta de datos de un equipo real: sin los restos de la 3 y
+sin las cachés, pasó de 537 MB a 92 MB, el programa arrancó normal, abrió un
+proyecto nuevo y no volvió a crear los restos. En Windows y macOS no se ha
+probado.
+
+---
+
+## Elegir un icono para un bloque
+
+Al pulsar el icono que va delante del título de un bloque se abre **Seleccionar
+icono**, con tres opciones:
+
+- **Iconos del estilo**: los del estilo elegido (Neo, por ejemplo, trae 50). Los
+  de cada estilo están en `exelearning-iconos-de-los-estilos`.
+- **Iconos generales**: una colección común a todos los estilos, de 3.798 iconos.
+- **Imagen**: para usar una imagen propia.
+
+**El buscador solo entiende los nombres en inglés**: «science» encuentra
+iconos y «ciencia» no encuentra ninguno; «experiment» encuentra el del estilo y
+uno general. Al pasar el ratón por un icono se ve su nombre.
+
+**Probado** el 14-11-2026 con los archivos de eXeLearning 4.0.6 abiertos como
+web, en Chromium, con el estilo Neo.

@@ -193,6 +193,51 @@ def catalogo_hackexe(repo: Path) -> str | None:
     return "\n".join(lineas).rstrip() + "\n"
 
 
+# Los iconos que cada estilo ofrece para los bloques no están documentados en
+# ningún sitio: son los archivos de su carpeta `icons`, y el selector muestra su
+# nombre de archivo. Se listan de la versión publicada, para que Karla pueda decir
+# qué iconos tiene un estilo y por qué palabra buscarlos (el buscador del
+# selector solo entiende esos nombres, en inglés). Pregunta del grupo que lo
+# motivó, el 08-11-2026: «Estoy usando el estilo NEO y […] me cuesta elegir de
+# tantos que hay».
+ICONOS_TITULO = "exelearning-iconos-de-los-estilos.md"
+ICONOS_ESTILOS = "public/files/perm/themes/base"
+ICONOS_GENERALES = "public/app/workarea/project/idevices/content/materialIconCatalog.js"
+
+
+def iconos_de_los_estilos(repo: Path, version: str) -> str | None:
+    """Los iconos de cada estilo oficial en la versión publicada, en Markdown."""
+    estilos: dict[str, list[str]] = {}
+    for ruta in archivos_del_tag(repo, version):
+        partes = ruta.split("/")
+        if (ruta.startswith(ICONOS_ESTILOS + "/") and len(partes) == 8
+                and partes[6] == "icons"):
+            estilos.setdefault(partes[5], []).append(Path(partes[7]).stem)
+    if not estilos:
+        registrar(f"  aviso: no hay iconos de estilos en la {version}")
+        return None
+    catalogo = subprocess.run(["git", "-C", str(repo), "show", f"{version}:{ICONOS_GENERALES}"],
+                              capture_output=True, text=True).stdout
+    generales = len(re.findall(r'^\s*"[^"]+",?\s*$', catalogo, re.M))
+    lineas = [
+        "# Iconos de los estilos de eXeLearning",
+        "",
+        f"Iconos que trae cada estilo oficial de la {version} para ponerlos delante",
+        "del título de un bloque, sacados de su carpeta `icons`. En la ventana",
+        "**Seleccionar icono** salen primero los **Iconos del estilo** elegido y,",
+        "debajo, los **Iconos generales**, que son los mismos para todos los estilos"
+        + (f" ({generales})." if generales else "."),
+        "El nombre de cada icono es el que se ve al pasar el ratón por encima y el",
+        "que encuentra el buscador del selector, que solo busca por estos nombres,",
+        "en inglés: a quien busca en español hay que darle la palabra inglesa.",
+        "",
+    ]
+    for estilo in sorted(estilos):
+        nombres = sorted(set(estilos[estilo]))
+        lineas += [f"## {estilo} ({len(nombres)} iconos)", "", ", ".join(nombres), ""]
+    return "\n".join(lineas).rstrip() + "\n"
+
+
 # Las decisiones de arquitectura explican por qué el programa hace lo que hace,
 # pero son veinte archivos cortos: como fuentes sueltas se pisan entre ellas, así
 # que van en un único documento.
@@ -389,6 +434,11 @@ def reunir_documentos(repo: Path, extras: dict[str, Path]) -> dict[str, str]:
     documentos = recoger(repo, INCLUIR, "exelearning",
                          version if version != "desconocida" else None)
 
+    if version != "desconocida":
+        iconos = iconos_de_los_estilos(repo, version)
+        if iconos:
+            documentos[ICONOS_TITULO] = iconos
+
     for prefijo, ruta_repo in extras.items():
         documentos.update(recoger(ruta_repo, COMPLEMENTARIOS[prefijo], prefijo))
         if prefijo == "hackexe4":
@@ -472,6 +522,8 @@ def escribir_indice(documentos: dict[str, str], repo: Path) -> tuple[str, str]:
         "- **Compartir sin aula virtual**: `exeviewer-README_es` (se instala como",
         "  aplicación y funciona sin conexión) y `visor-webzip-README`.",
         "- **Estilos propios**: `doc-development-styles` y `edex-README`, el editor.",
+        "- **Qué iconos tiene un estilo y cómo encontrarlos en el selector**:",
+        "  `exelearning-iconos-de-los-estilos`.",
         "- **Convertir entre formatos** (.elp, .elpx, .docx, .md, .pdf):",
         "  `execonvert-README`.",
         "- **Ampliar lo que hacen los iDevices** pegando HTML, CSS o JS, o buscar",
