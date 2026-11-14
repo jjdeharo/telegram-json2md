@@ -368,13 +368,14 @@ probado.
 
 ## Elegir un icono para un bloque
 
-Al pulsar el icono que va delante del título de un bloque se abre **Seleccionar
-icono**, con tres opciones:
+Al pulsar el icono que va delante del título de un bloque se abre la ventana
+**Seleccionar icono**. Arriba tiene un buscador y el botón **Imagen**, para usar
+una imagen propia; debajo, en una sola lista que se desplaza, dos apartados:
 
-- **Iconos del estilo**: los del estilo elegido (Neo, por ejemplo, trae 50). Los
-  de cada estilo están en `exelearning-iconos-de-los-estilos`.
+- **Iconos del estilo**: los del estilo elegido (Neo, por ejemplo, trae 50). Sus
+  nombres, estilo por estilo, están en el documento
+  `exelearning-iconos-de-los-estilos`.
 - **Iconos generales**: una colección común a todos los estilos, de 3.798 iconos.
-- **Imagen**: para usar una imagen propia.
 
 **El buscador solo entiende los nombres en inglés**: «science» encuentra
 iconos y «ciencia» no encuentra ninguno; «experiment» encuentra el del estilo y
