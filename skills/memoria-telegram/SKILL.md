@@ -30,6 +30,11 @@ docker exec -it memoria-telegram bash    # y ya estás en /proyecto
 | eXeLearning | `@exelearning` | `salida/exelearning/` | Karla - Experta en eXeLearning |
 | Vibe Coding Educativo | `@vceduca` | `salida/vibe-coding-educativo/` | Agente Vibe Coding Educativo |
 
+El 20-11-2026 Juanjo anunció que los cuadernos de ChatGPT-IA-edu y de Vibe Coding
+Educativo se eliminarán («estos notebooklm serán eliminados») y se quitaron de los
+mensajes fijados de los dos grupos; las consultas pasan al Bot de IA Educativa.
+Mientras no dé la orden, se siguen actualizando y no se borra nada.
+
 Los identificadores de notebook y las credenciales están en `config.json`, que
 no se versiona. Léelo de ahí; no los pidas ni los inventes.
 
